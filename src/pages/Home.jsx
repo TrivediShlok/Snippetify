@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
     Container,
     Typography,
@@ -7,207 +7,274 @@ import {
     Grid,
     Paper,
     Chip,
+    Avatar,
 } from "@mui/material";
 import {
     Code,
     Search,
     Share,
-    Lock,
-    Rocket,
-    Bolt, // Changed from Zap to Bolt
-    Star,
     Security,
+    Rocket,
+    Star,
+    TrendingUp,
+    Speed,
+    AutoAwesome,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
 const Home = ({ user }) => {
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Create floating particles
-        const createParticle = () => {
-            const particle = document.createElement("div");
-            particle.className = "particle";
-            particle.style.left = Math.random() * 100 + "vw";
-            particle.style.animationDuration = Math.random() * 3 + 2 + "s";
-            particle.style.opacity = Math.random();
-            document.body.appendChild(particle);
-
-            setTimeout(() => {
-                particle.remove();
-            }, 5000);
-        };
-
-        const particleInterval = setInterval(createParticle, 300);
-        return () => clearInterval(particleInterval);
-    }, []);
-
     const features = [
         {
             icon: <Code />,
-            title: "Smart Code Storage",
+            title: "Smart Organization",
             description:
-                "AI-powered snippet organization with intelligent tagging and categorization.",
-            color: "#00f5ff",
+                "Organize your code snippets with AI-powered categorization and intelligent search capabilities.",
+            color: "#6366f1",
+            bgColor: "rgba(99, 102, 241, 0.1)",
         },
         {
             icon: <Search />,
-            title: "Quantum Search",
+            title: "Lightning Search",
             description:
-                "Lightning-fast search across millions of code snippets with advanced filtering.",
-            color: "#ff0080",
+                "Find any snippet instantly with our powerful search engine that understands your code.",
+            color: "#10b981",
+            bgColor: "rgba(16, 185, 129, 0.1)",
         },
         {
             icon: <Share />,
-            title: "Global Sharing",
+            title: "Seamless Sharing",
             description:
-                "Share your code with developers worldwide or keep it private in your vault.",
-            color: "#00e676",
+                "Share your snippets with the world or keep them private in your secure personal vault.",
+            color: "#ec4899",
+            bgColor: "rgba(236, 72, 153, 0.1)",
         },
         {
             icon: <Security />,
-            title: "Cyber Security",
+            title: "Bank-Level Security",
             description:
-                "Military-grade encryption protects your valuable code snippets.",
-            color: "#ff9800",
+                "Your code is protected with enterprise-grade security and encrypted storage.",
+            color: "#f59e0b",
+            bgColor: "rgba(245, 158, 11, 0.1)",
         },
     ];
 
     const stats = [
-        { number: "10K+", label: "Code Snippets", icon: <Code /> },
-        { number: "500+", label: "Developers", icon: <Star /> },
-        { number: "50+", label: "Languages", icon: <Bolt /> }, // Changed from Zap to Bolt
-        { number: "99.9%", label: "Uptime", icon: <Rocket /> },
+        {
+            number: "50K+",
+            label: "Code Snippets",
+            icon: <Code />,
+            color: "#6366f1",
+        },
+        {
+            number: "2.5K+",
+            label: "Happy Developers",
+            icon: <Star />,
+            color: "#ec4899",
+        },
+        {
+            number: "100+",
+            label: "Programming Languages",
+            icon: <Speed />,
+            color: "#10b981",
+        },
+        {
+            number: "99.9%",
+            label: "Uptime",
+            icon: <TrendingUp />,
+            color: "#f59e0b",
+        },
     ];
 
     return (
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{ py: 4 }}>
             {/* Hero Section */}
-            <Box textAlign="center" py={10} position="relative">
-                <Box className="floating">
+            <Box
+                className="hero-section"
+                textAlign="center"
+                position="relative"
+            >
+                <Box sx={{ position: "relative", zIndex: 1 }}>
+                    <Chip
+                        icon={<AutoAwesome />}
+                        label="✨ The Future of Code Management"
+                        sx={{
+                            mb: 3,
+                            background:
+                                "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))",
+                            border: "1px solid rgba(99, 102, 241, 0.2)",
+                            color: "#6366f1",
+                            fontWeight: 500,
+                            px: 2,
+                            py: 0.5,
+                        }}
+                    />
                     <Typography
                         variant="h1"
                         component="h1"
                         sx={{
-                            fontSize: { xs: "3rem", md: "5rem" },
-                            fontWeight: 900,
+                            fontSize: {
+                                xs: "2.5rem",
+                                sm: "3.5rem",
+                                md: "4.5rem",
+                            },
+                            fontWeight: 800,
+                            mb: 3,
                             background:
-                                "linear-gradient(45deg, #00f5ff, #ff0080, #00e676)",
+                                "linear-gradient(135deg, #1f2937 0%, #6366f1 50%, #ec4899 100%)",
                             WebkitBackgroundClip: "text",
                             WebkitTextFillColor: "transparent",
-                            textShadow: "0 0 40px rgba(0, 245, 255, 0.5)",
-                            mb: 2,
+                            letterSpacing: "-0.02em",
                         }}
                     >
-                        SNIPPETIFY
+                    All Your Code Snippets<br/>At One Place<br />
                     </Typography>
                     <Typography
-                        variant="h4"
+                        variant="h5"
                         sx={{
-                            color: "#b0bec5",
+                            color: "#6b7280",
                             mb: 4,
-                            fontSize: { xs: "1.5rem", md: "2rem" },
-                        }}
-                    >
-                        The Future of Code Management
-                    </Typography>
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            color: "#78909c",
-                            mb: 6,
                             maxWidth: "600px",
                             mx: "auto",
                             lineHeight: 1.6,
+                            fontSize: { xs: "1.1rem", md: "1.25rem" },
+                            fontWeight: 400,
                         }}
                     >
-                        Enter the next generation of code snippet management.
-                        Store, organize, and share your code with futuristic
-                        AI-powered tools.
+                        Store, organize, and share your code snippets with our
+                        beautiful, intuitive platform designed for modern
+                        developers.
                     </Typography>
-                </Box>
 
-                {user ? (
-                    <Box>
-                        <Chip
-                            label="AUTHENTICATED USER"
-                            sx={{
-                                background:
-                                    "linear-gradient(45deg, #00f5ff, #00e676)",
-                                color: "white",
-                                fontSize: "1rem",
-                                py: 2,
-                                px: 4,
-                                mb: 3,
-                                fontWeight: 600,
-                            }}
-                        />
+                    {user ? (
                         <Box>
+                            <Chip
+                                label={`Welcome back, ${
+                                    user.firstName || user.username
+                                }! 🎉`}
+                                avatar={
+                                    <Avatar
+                                        sx={{
+                                            bgcolor: "#10b981",
+                                            width: 24,
+                                            height: 24,
+                                        }}
+                                    >
+                                        {user.username?.charAt(0).toUpperCase()}
+                                    </Avatar>
+                                }
+                                sx={{
+                                    mb: 4,
+                                    background:
+                                        "linear-gradient(135deg, #10b981, #059669)",
+                                    color: "white",
+                                    fontSize: "1rem",
+                                    py: 2,
+                                    px: 3,
+                                    fontWeight: 600,
+                                }}
+                            />
+                            <Box>
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    onClick={() => navigate("/dashboard")}
+                                    startIcon={<Rocket />}
+                                    sx={{
+                                        fontSize: "1.1rem",
+                                        py: 2,
+                                        px: 4,
+                                        borderRadius: "12px",
+                                        background:
+                                            "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                                        boxShadow:
+                                            "0 8px 25px rgba(99, 102, 241, 0.3)",
+                                        "&:hover": {
+                                            background:
+                                                "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                                            transform: "translateY(-2px)",
+                                            boxShadow:
+                                                "0 12px 35px rgba(99, 102, 241, 0.4)",
+                                        },
+                                    }}
+                                >
+                                    Open Dashboard
+                                </Button>
+                            </Box>
+                        </Box>
+                    ) : (
+                        <Box
+                            display="flex"
+                            gap={2}
+                            justifyContent="center"
+                            flexWrap="wrap"
+                        >
                             <Button
                                 variant="contained"
                                 size="large"
-                                onClick={() => navigate("/dashboard")}
-                                className="cyber-button"
+                                onClick={() => navigate("/")} // This would trigger signup
                                 sx={{
-                                    fontSize: "1.2rem",
+                                    fontSize: "1.1rem",
                                     py: 2,
                                     px: 4,
-                                    borderRadius: "30px",
+                                    borderRadius: "12px",
                                     background:
-                                        "linear-gradient(45deg, #00f5ff, #ff0080)",
+                                        "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                                    boxShadow:
+                                        "0 8px 25px rgba(99, 102, 241, 0.3)",
                                     "&:hover": {
-                                        transform:
-                                            "translateY(-5px) scale(1.05)",
+                                        background:
+                                            "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                                        transform: "translateY(-2px)",
                                         boxShadow:
-                                            "0 10px 40px rgba(0, 245, 255, 0.6)",
+                                            "0 12px 35px rgba(99, 102, 241, 0.4)",
                                     },
                                 }}
-                                startIcon={<Rocket />}
                             >
-                                LAUNCH DASHBOARD
+                                Get Started Free
+                            </Button>
+                            <Button
+                                variant="outlined"
+                                size="large"
+                                sx={{
+                                    fontSize: "1.1rem",
+                                    py: 2,
+                                    px: 4,
+                                    borderRadius: "12px",
+                                    borderColor: "rgba(99, 102, 241, 0.3)",
+                                    color: "#6366f1",
+                                    "&:hover": {
+                                        borderColor: "#6366f1",
+                                        backgroundColor:
+                                            "rgba(99, 102, 241, 0.04)",
+                                        transform: "translateY(-1px)",
+                                    },
+                                }}
+                            >
+                                View Demo
                             </Button>
                         </Box>
-                    </Box>
-                ) : (
-                    <Box>
-                        <Typography
-                            variant="body1"
-                            sx={{
-                                color: "#90a4ae",
-                                fontSize: "1.1rem",
-                                mb: 4,
-                            }}
-                        >
-                            Join the revolution. Authenticate to access your
-                            personal code vault.
-                        </Typography>
-                    </Box>
-                )}
+                    )}
+                </Box>
             </Box>
 
             {/* Stats Section */}
             <Box py={6}>
-                <Grid container spacing={4}>
+                <Grid container spacing={3}>
                     {stats.map((stat, index) => (
                         <Grid item xs={6} md={3} key={index}>
-                            <Paper
-                                className="glass-card hover-glow"
-                                sx={{
-                                    p: 3,
-                                    textAlign: "center",
-                                    background: "rgba(20, 20, 30, 0.7)",
-                                    backdropFilter: "blur(15px)",
-                                    border: "1px solid rgba(0, 245, 255, 0.3)",
-                                    borderRadius: "20px",
-                                    transition: "all 0.3s ease",
-                                    "&:hover": {
-                                        transform: "translateY(-10px)",
-                                        boxShadow:
-                                            "0 20px 40px rgba(0, 245, 255, 0.3)",
-                                    },
-                                }}
-                            >
-                                <Box color="#00f5ff" mb={2}>
+                            <Paper className="stats-card" elevation={0}>
+                                <Box
+                                    sx={{
+                                        color: stat.color,
+                                        mb: 2,
+                                        p: 1,
+                                        borderRadius: "12px",
+                                        backgroundColor: `${stat.color}15`,
+                                        display: "inline-flex",
+                                    }}
+                                >
                                     {React.cloneElement(stat.icon, {
                                         fontSize: "large",
                                     })}
@@ -215,16 +282,21 @@ const Home = ({ user }) => {
                                 <Typography
                                     variant="h3"
                                     sx={{
-                                        color: "#00f5ff",
-                                        fontWeight: 700,
+                                        color: "#1f2937",
+                                        fontWeight: 800,
                                         mb: 1,
+                                        fontSize: { xs: "2rem", md: "2.5rem" },
                                     }}
                                 >
                                     {stat.number}
                                 </Typography>
                                 <Typography
                                     variant="body1"
-                                    color="text.secondary"
+                                    sx={{
+                                        color: "#6b7280",
+                                        fontWeight: 500,
+                                        fontSize: "0.95rem",
+                                    }}
                                 >
                                     {stat.label}
                                 </Typography>
@@ -236,66 +308,59 @@ const Home = ({ user }) => {
 
             {/* Features Section */}
             <Box py={8}>
-                <Typography
-                    variant="h2"
-                    textAlign="center"
-                    sx={{
-                        mb: 6,
-                        background: "linear-gradient(45deg, #00f5ff, #ff0080)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                    }}
-                >
-                    QUANTUM FEATURES
-                </Typography>
+                <Box textAlign="center" mb={6}>
+                    <Typography
+                        variant="h2"
+                        sx={{
+                            fontWeight: 700,
+                            mb: 3,
+                            background:
+                                "linear-gradient(135deg, #1f2937 0%, #6366f1 100%)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                        }}
+                    >
+                        Why Developers Love Us
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            color: "#6b7280",
+                            fontWeight: 400,
+                            maxWidth: "500px",
+                            mx: "auto",
+                        }}
+                    >
+                        Everything you need to manage your code snippets
+                        beautifully and efficiently.
+                    </Typography>
+                </Box>
                 <Grid container spacing={4}>
                     {features.map((feature, index) => (
                         <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Paper
-                                className="glass-card hover-glow floating"
-                                sx={{
-                                    p: 4,
-                                    height: "100%",
-                                    textAlign: "center",
-                                    background: "rgba(20, 20, 30, 0.6)",
-                                    backdropFilter: "blur(15px)",
-                                    border: `2px solid ${feature.color}30`,
-                                    borderRadius: "25px",
-                                    position: "relative",
-                                    overflow: "hidden",
-                                    "&::before": {
-                                        content: '""',
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        height: "4px",
-                                        background: `linear-gradient(90deg, ${feature.color}, transparent)`,
-                                    },
-                                    "&:hover": {
-                                        borderColor: feature.color,
-                                        boxShadow: `0 0 30px ${feature.color}50`,
-                                    },
-                                    animationDelay: `${index * 0.2}s`,
-                                }}
-                            >
+                            <Paper className="feature-card" elevation={0}>
                                 <Box
                                     sx={{
-                                        color: feature.color,
-                                        mb: 3,
+                                        width: 64,
+                                        height: 64,
+                                        borderRadius: "16px",
+                                        background: feature.bgColor,
                                         display: "flex",
+                                        alignItems: "center",
                                         justifyContent: "center",
+                                        mx: "auto",
+                                        mb: 3,
+                                        color: feature.color,
                                     }}
                                 >
                                     {React.cloneElement(feature.icon, {
                                         fontSize: "large",
-                                        sx: { fontSize: "3rem" },
                                     })}
                                 </Box>
                                 <Typography
                                     variant="h6"
                                     sx={{
-                                        color: feature.color,
+                                        color: "#1f2937",
                                         mb: 2,
                                         fontWeight: 600,
                                     }}
@@ -305,8 +370,9 @@ const Home = ({ user }) => {
                                 <Typography
                                     variant="body2"
                                     sx={{
-                                        color: "text.secondary",
+                                        color: "#6b7280",
                                         lineHeight: 1.6,
+                                        fontSize: "0.95rem",
                                     }}
                                 >
                                     {feature.description}
@@ -323,47 +389,59 @@ const Home = ({ user }) => {
                 py={10}
                 sx={{
                     background:
-                        "linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(255, 0, 128, 0.1))",
-                    borderRadius: "30px",
-                    border: "1px solid rgba(0, 245, 255, 0.3)",
-                    mt: 6,
+                        "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%)",
+                    borderRadius: "24px",
+                    border: "1px solid rgba(99, 102, 241, 0.1)",
+                    position: "relative",
+                    overflow: "hidden",
                 }}
             >
                 <Typography
                     variant="h3"
                     sx={{
                         mb: 3,
-                        background: "linear-gradient(45deg, #00f5ff, #ff0080)",
+                        fontWeight: 700,
+                        background:
+                            "linear-gradient(135deg, #1f2937 0%, #6366f1 100%)",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                     }}
                 >
-                    Ready to Join the Future?
+                    Ready to Transform Your Workflow?
                 </Typography>
-                <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-                    Start your journey into the next generation of code
-                    management
+                <Typography
+                    variant="h6"
+                    sx={{
+                        color: "#6b7280",
+                        mb: 4,
+                        fontWeight: 400,
+                    }}
+                >
+                    Join thousands of developers who've already made the switch
                 </Typography>
                 {!user && (
                     <Button
                         variant="contained"
                         size="large"
-                        className="cyber-button"
                         sx={{
-                            fontSize: "1.3rem",
+                            fontSize: "1.1rem",
                             py: 2,
                             px: 6,
-                            borderRadius: "35px",
+                            borderRadius: "12px",
                             background:
-                                "linear-gradient(45deg, #ff0080, #00f5ff)",
+                                "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                            boxShadow: "0 8px 25px rgba(99, 102, 241, 0.3)",
                             "&:hover": {
-                                transform: "scale(1.1) translateY(-5px)",
-                                boxShadow: "0 15px 40px rgba(255, 0, 128, 0.6)",
+                                background:
+                                    "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                                transform: "translateY(-2px)",
+                                boxShadow:
+                                    "0 12px 35px rgba(99, 102, 241, 0.4)",
                             },
                         }}
-                        startIcon={<Bolt />} // Changed from Zap to Bolt
+                        startIcon={<Star />}
                     >
-                        ACTIVATE NOW
+                        Start Your Journey
                     </Button>
                 )}
             </Box>

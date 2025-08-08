@@ -1,192 +1,232 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { Toaster } from 'react-hot-toast';
-import App from './App';
-import './styles/globals.css';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { Toaster } from "react-hot-toast";
+import App from "./App";
+import "./styles/globals.css";
 
 const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#2563eb', // Professional blue
-      light: '#3b82f6',
-      dark: '#1d4ed8',
-    },
-    secondary: {
-      main: '#7c3aed', // Elegant purple
-      light: '#8b5cf6',
-      dark: '#6d28d9',
-    },
-    background: {
-      default: '#f8fafc',
-      paper: '#ffffff',
-    },
-    text: {
-      primary: '#1e293b',
-      secondary: '#64748b',
-    },
-    error: {
-      main: '#dc2626',
-    },
-    warning: {
-      main: '#ea580c',
-    },
-    info: {
-      main: '#0ea5e9',
-    },
-    success: {
-      main: '#059669',
-    },
-    grey: {
-      50: '#f8fafc',
-      100: '#f1f5f9',
-      200: '#e2e8f0',
-      300: '#cbd5e1',
-      400: '#94a3b8',
-      500: '#64748b',
-      600: '#475569',
-      700: '#334155',
-      800: '#1e293b',
-      900: '#0f172a',
-    },
-  },
-  typography: {
-    fontFamily: '"Inter", "Roboto", "Arial", sans-serif',
-    h1: {
-      fontWeight: 700,
-      fontSize: '3.5rem',
-      color: '#1e293b',
-      letterSpacing: '-0.025em',
-    },
-    h2: {
-      fontWeight: 600,
-      fontSize: '2.75rem',
-      color: '#334155',
-      letterSpacing: '-0.025em',
-    },
-    h4: {
-      fontWeight: 600,
-      color: '#2563eb',
-    },
-    h6: {
-      fontWeight: 500,
-      color: '#475569',
-    },
-    body1: {
-      fontSize: '1rem',
-      lineHeight: 1.7,
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: '8px',
-          textTransform: 'none',
-          fontWeight: 600,
-          padding: '10px 20px',
-          boxShadow: 'none',
-          transition: 'all 0.2s ease-in-out',
-          '&:hover': {
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.3)',
-            transform: 'translateY(-1px)',
-          },
+    palette: {
+        mode: "light",
+        primary: {
+            main: "#6366f1", // Beautiful indigo
+            light: "#818cf8",
+            dark: "#4f46e5",
         },
-        contained: {
-          background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-          '&:hover': {
-            background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
-          },
+        secondary: {
+            main: "#ec4899", // Elegant pink
+            light: "#f472b6",
+            dark: "#db2777",
         },
-        outlined: {
-          borderColor: '#e2e8f0',
-          color: '#64748b',
-          '&:hover': {
-            borderColor: '#2563eb',
-            backgroundColor: 'rgba(37, 99, 235, 0.04)',
-          },
+        background: {
+            default: "#fafbfc",
+            paper: "#ffffff",
         },
-      },
+        text: {
+            primary: "#1f2937",
+            secondary: "#6b7280",
+        },
+        success: {
+            main: "#10b981",
+            light: "#34d399",
+        },
+        warning: {
+            main: "#f59e0b",
+        },
+        error: {
+            main: "#ef4444",
+        },
+        grey: {
+            50: "#f9fafb",
+            100: "#f3f4f6",
+            200: "#e5e7eb",
+            300: "#d1d5db",
+            400: "#9ca3af",
+            500: "#6b7280",
+            600: "#4b5563",
+            700: "#374151",
+            800: "#1f2937",
+            900: "#111827",
+        },
     },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-          borderRadius: '12px',
-          border: '1px solid #e2e8f0',
-          transition: 'all 0.2s ease-in-out',
-          '&:hover': {
-            boxShadow: '0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-            transform: 'translateY(-2px)',
-          },
+    typography: {
+        fontFamily: '"Poppins", "Roboto", "Arial", sans-serif',
+        h1: {
+            fontWeight: 700,
+            fontSize: "3.5rem",
+            lineHeight: 1.2,
+            letterSpacing: "-0.02em",
         },
-      },
+        h2: {
+            fontWeight: 600,
+            fontSize: "2.25rem",
+            lineHeight: 1.3,
+            letterSpacing: "-0.01em",
+        },
+        h3: {
+            fontWeight: 600,
+            fontSize: "1.875rem",
+            lineHeight: 1.4,
+        },
+        h4: {
+            fontWeight: 600,
+            fontSize: "1.5rem",
+            lineHeight: 1.4,
+        },
+        h5: {
+            fontWeight: 600,
+            fontSize: "1.25rem",
+            lineHeight: 1.4,
+        },
+        h6: {
+            fontWeight: 600,
+            fontSize: "1.125rem",
+            lineHeight: 1.4,
+        },
+        body1: {
+            fontSize: "1rem",
+            lineHeight: 1.6,
+        },
+        body2: {
+            fontSize: "0.875rem",
+            lineHeight: 1.5,
+        },
     },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: '8px',
-            backgroundColor: '#ffffff',
-            '& fieldset': {
-              borderColor: '#e2e8f0',
+    shape: {
+        borderRadius: 12,
+    },
+    components: {
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: "12px",
+                    textTransform: "none",
+                    fontWeight: 600,
+                    padding: "12px 24px",
+                    fontSize: "0.875rem",
+                    boxShadow: "none",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                        transform: "translateY(-2px)",
+                        boxShadow:
+                            "0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                    },
+                },
+                contained: {
+                    background:
+                        "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
+                    "&:hover": {
+                        background:
+                            "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                    },
+                },
+                outlined: {
+                    borderColor: "#e5e7eb",
+                    color: "#374151",
+                    "&:hover": {
+                        borderColor: "#6366f1",
+                        backgroundColor: "rgba(99, 102, 241, 0.04)",
+                    },
+                },
             },
-            '&:hover fieldset': {
-              borderColor: '#cbd5e1',
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: '#2563eb',
-              borderWidth: '2px',
-            },
-          },
         },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        MuiCard: {
+            styleOverrides: {
+                root: {
+                    boxShadow:
+                        "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+                    borderRadius: "16px",
+                    border: "1px solid #f3f4f6",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    "&:hover": {
+                        transform: "translateY(-4px)",
+                        boxShadow:
+                            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                        borderColor: "#e5e7eb",
+                    },
+                },
+            },
         },
-      },
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    "& .MuiOutlinedInput-root": {
+                        borderRadius: "12px",
+                        backgroundColor: "#ffffff",
+                        "& fieldset": {
+                            borderColor: "#e5e7eb",
+                        },
+                        "&:hover fieldset": {
+                            borderColor: "#d1d5db",
+                        },
+                        "&.Mui-focused fieldset": {
+                            borderColor: "#6366f1",
+                            borderWidth: "2px",
+                        },
+                    },
+                },
+            },
+        },
+        MuiChip: {
+            styleOverrides: {
+                root: {
+                    borderRadius: "8px",
+                    fontWeight: 500,
+                    fontSize: "0.75rem",
+                },
+            },
+        },
+        MuiAppBar: {
+            styleOverrides: {
+                root: {
+                    backgroundColor: "rgba(255, 255, 255, 0.95)",
+                    backdropFilter: "blur(20px)",
+                    boxShadow:
+                        "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
+                    borderBottom: "1px solid rgba(229, 231, 235, 0.5)",
+                },
+            },
+        },
     },
-  },
 });
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: '#ffffff',
-              color: '#1e293b',
-              border: '1px solid #e2e8f0',
-              borderRadius: '8px',
-              boxShadow: '0 10px 25px -3px rgba(0, 0, 0, 0.1)',
-            },
-            success: {
-              iconTheme: {
-                primary: '#059669',
-                secondary: '#ffffff',
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: '#dc2626',
-                secondary: '#ffffff',
-              },
-            },
-          }}
-        />
-      </ThemeProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+    <React.StrictMode>
+        <BrowserRouter>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <App />
+                <Toaster
+                    position="top-right"
+                    toastOptions={{
+                        style: {
+                            background: "#ffffff",
+                            color: "#1f2937",
+                            border: "1px solid #f3f4f6",
+                            borderRadius: "12px",
+                            boxShadow:
+                                "0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                            padding: "16px",
+                            fontSize: "0.875rem",
+                        },
+                        success: {
+                            iconTheme: {
+                                primary: "#10b981",
+                                secondary: "#ffffff",
+                            },
+                        },
+                        error: {
+                            iconTheme: {
+                                primary: "#ef4444",
+                                secondary: "#ffffff",
+                            },
+                        },
+                    }}
+                />
+            </ThemeProvider>
+        </BrowserRouter>
+    </React.StrictMode>
 );
