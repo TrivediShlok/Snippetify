@@ -8,9 +8,9 @@ import {
     Button,
     Stack,
     CircularProgress,
-    Divider,
+    Container,
 } from "@mui/material";
-import { ArrowBack, Edit, Delete } from "@mui/icons-material";
+import { ArrowBack, Edit, Delete, ContentCopy } from "@mui/icons-material";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { tomorrow } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { snippetService } from "../services/snippetService";
@@ -67,144 +67,203 @@ const SnippetDetail = ({ user }) => {
 
     if (loading) {
         return (
-            <Box display="flex" justifyContent="center" py={4}>
-                <CircularProgress />
-            </Box>
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                <Box className="loading-container">
+                    <CircularProgress />
+                </Box>
+            </Container>
         );
     }
 
     if (!snippet) {
         return (
-            <Box textAlign="center" py={4}>
-                <Typography variant="h6" color="error">
-                    Snippet not found
-                </Typography>
-            </Box>
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                <Box className="empty-state">
+                    <Typography variant="h6" sx={{ color: "#374151" }}>
+                        Snippet not found
+                    </Typography>
+                </Box>
+            </Container>
         );
     }
 
     const isOwner = user && snippet.author && snippet.author._id === user._id;
 
     return (
-        <Box>
+        <Container maxWidth="xl" sx={{ py: 4 }}>
             <Button
                 startIcon={<ArrowBack />}
                 onClick={() => navigate("/dashboard")}
-                sx={{ mb: 2 }}
+                sx={{
+                    mb: 3,
+                    color: "#6b7280",
+                    "&:hover": {
+                        color: "#3b82f6",
+                        backgroundColor: "rgba(59, 130, 246, 0.05)",
+                    },
+                }}
             >
                 Back to Dashboard
             </Button>
 
-            <Paper sx={{ p: 3 }}>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 4,
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "12px",
+                    mb: 3,
+                }}
+            >
                 <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="start"
-                    mb={2}
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        mb: 3,
+                        flexWrap: "wrap",
+                        gap: 2,
+                    }}
                 >
-                    <Box>
-                        <Typography variant="h4" gutterBottom>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography
+                            variant="h4"
+                            sx={{ fontWeight: 600, mb: 1, color: "#1f2937" }}
+                        >
                             {snippet.title}
                         </Typography>
-                        <Typography
-                            variant="body1"
-                            color="text.secondary"
-                            paragraph
-                        >
+                        <Typography sx={{ color: "#6b7280", mb: 2 }}>
                             {snippet.description || "No description provided"}
+                        </Typography>
+
+                        <Stack
+                            direction="row"
+                            spacing={1}
+                            flexWrap="wrap"
+                            sx={{ mb: 2 }}
+                        >
+                            <Chip
+                                label={
+                                    snippet.language?.toUpperCase() || "UNKNOWN"
+                                }
+                                color="primary"
+                                size="small"
+                            />
+                            {snippet.tags?.map((tag) => (
+                                <Chip
+                                    key={tag}
+                                    label={tag}
+                                    variant="outlined"
+                                    size="small"
+                                />
+                            ))}
+                        </Stack>
+
+                        <Typography variant="body2" sx={{ color: "#6b7280" }}>
+                            Created:{" "}
+                            {new Date(snippet.createdAt).toLocaleDateString()} •
+                            Views: {snippet.views || 0}
+                            {snippet.author && (
+                                <>
+                                    {" • By: "}
+                                    {snippet.author.username ||
+                                        snippet.author.firstName}
+                                </>
+                            )}
                         </Typography>
                     </Box>
 
                     {isOwner && (
                         <Stack direction="row" spacing={1}>
                             <Button
-                                startIcon={<Edit />}
                                 onClick={handleEdit}
                                 variant="outlined"
                                 size="small"
+                                startIcon={<Edit />}
                             >
                                 Edit
                             </Button>
                             <Button
-                                startIcon={<Delete />}
                                 onClick={handleDelete}
                                 variant="outlined"
                                 color="error"
                                 size="small"
+                                startIcon={<Delete />}
                             >
                                 Delete
                             </Button>
                         </Stack>
                     )}
                 </Box>
+            </Paper>
 
-                <Stack direction="row" spacing={1} mb={2} flexWrap="wrap">
-                    <Chip
-                        label={snippet.language?.toUpperCase()}
-                        color="primary"
-                    />
-                    {snippet.tags?.map((tag) => (
-                        <Chip
-                            key={tag._id || tag}
-                            label={typeof tag === "object" ? tag.name : tag}
-                            variant="outlined"
-                            size="small"
-                        />
-                    ))}
-                    <Chip
-                        label={snippet.isPublic ? "Public" : "Private"}
-                        variant="outlined"
-                        size="small"
-                    />
-                </Stack>
-
-                <Box mb={2}>
-                    <Typography variant="caption" color="text.secondary">
-                        Created:{" "}
-                        {new Date(snippet.createdAt).toLocaleDateString()} •
-                        Views: {snippet.views || 0}
-                        {snippet.author && (
-                            <>
-                                {" "}
-                                • By:{" "}
-                                {snippet.author.username ||
-                                    snippet.author.firstName}
-                            </>
-                        )}
+            <Paper
+                elevation={0}
+                sx={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "12px",
+                    overflow: "hidden",
+                }}
+            >
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        p: 2,
+                        backgroundColor: "#f8fafc",
+                        borderBottom: "1px solid #e5e7eb",
+                    }}
+                >
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: "#6b7280",
+                            fontFamily: "monospace",
+                        }}
+                    >
+                        {snippet.language || "code"}.
+                        {snippet.language === "javascript"
+                            ? "js"
+                            : snippet.language === "python"
+                            ? "py"
+                            : "txt"}
                     </Typography>
-                </Box>
-
-                <Divider sx={{ mb: 2 }} />
-
-                <Box position="relative">
                     <Button
                         onClick={copyToClipboard}
-                        variant="outlined"
                         size="small"
+                        startIcon={<ContentCopy />}
                         sx={{
-                            position: "absolute",
-                            right: 8,
-                            top: 8,
-                            zIndex: 1,
+                            color: "#6b7280",
+                            "&:hover": {
+                                color: "#3b82f6",
+                                backgroundColor: "rgba(59, 130, 246, 0.05)",
+                            },
                         }}
                     >
                         Copy
                     </Button>
+                </Box>
 
+                <Box sx={{ overflow: "auto" }}>
                     <SyntaxHighlighter
-                        language={snippet.language || "javascript"}
+                        language={snippet.language || "text"}
                         style={tomorrow}
                         customStyle={{
                             margin: 0,
-                            borderRadius: "8px",
+                            padding: "24px",
+                            background: "#0f172a",
                             fontSize: "14px",
+                            lineHeight: "1.5",
                         }}
                     >
                         {snippet.code}
                     </SyntaxHighlighter>
                 </Box>
             </Paper>
-        </Box>
+        </Container>
     );
 };
 

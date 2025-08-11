@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     Container,
     Typography,
@@ -7,7 +7,6 @@ import {
     Grid,
     Paper,
     Chip,
-    Avatar,
 } from "@mui/material";
 import {
     Code,
@@ -18,9 +17,85 @@ import {
     Star,
     TrendingUp,
     Speed,
-    AutoAwesome,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+
+const TypingEffect = () => {
+    const messages = [
+        "Snippetify",
+        "One Stop Solution",
+        "Code Management",
+    ];
+
+    const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+    const [currentText, setCurrentText] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [typeSpeed, setTypeSpeed] = useState(150);
+
+    useEffect(() => {
+        const handleTyping = () => {
+            const currentMessage = messages[currentMessageIndex];
+
+            if (isDeleting) {
+                setCurrentText(
+                    currentMessage.substring(0, currentText.length - 1)
+                );
+                setTypeSpeed(75);
+            } else {
+                setCurrentText(
+                    currentMessage.substring(0, currentText.length + 1)
+                );
+                setTypeSpeed(150);
+            }
+
+            if (!isDeleting && currentText === currentMessage) {
+                setTimeout(() => setIsDeleting(true), 2000);
+            } else if (isDeleting && currentText === "") {
+                setIsDeleting(false);
+                setCurrentMessageIndex(
+                    (prevIndex) => (prevIndex + 1) % messages.length
+                );
+            }
+        };
+
+        const timer = setTimeout(handleTyping, typeSpeed);
+        return () => clearTimeout(timer);
+    }, [currentText, isDeleting, currentMessageIndex, typeSpeed, messages]);
+
+    return (
+        <Typography
+            variant="h1"
+            component="h1"
+            sx={{
+                fontSize: { xs: "2.5rem", md: "3.5rem" },
+                fontWeight: 700,
+                mb: 2,
+                color: "#1f2937",
+                minHeight: { xs: "80px", md: "100px" },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            {currentText}
+            <Box
+                component="span"
+                sx={{
+                    display: "inline-block",
+                    width: "3px",
+                    height: { xs: "40px", md: "50px" },
+                    backgroundColor: "#3b82f6",
+                    marginLeft: "4px",
+                    animation: "blink 1s infinite",
+                    "@keyframes blink": {
+                        "0%, 50%": { opacity: 1 },
+                        "51%, 100%": { opacity: 0 },
+                    },
+                }}
+            />
+        </Typography>
+    );
+};
 
 const Home = ({ user }) => {
     const navigate = useNavigate();
@@ -30,52 +105,48 @@ const Home = ({ user }) => {
             icon: <Code />,
             title: "Smart Organization",
             description:
-                "Organize your code snippets with AI-powered categorization and intelligent search capabilities.",
-            color: "#6366f1",
-            bgColor: "rgba(99, 102, 241, 0.1)",
+                "Organize your code snippets with intelligent categorization and powerful tagging system.",
+            color: "#3b82f6",
         },
         {
             icon: <Search />,
             title: "Lightning Search",
             description:
-                "Find any snippet instantly with our powerful search engine that understands your code.",
+                "Find any snippet instantly with our advanced search that understands your code.",
             color: "#10b981",
-            bgColor: "rgba(16, 185, 129, 0.1)",
         },
         {
             icon: <Share />,
             title: "Seamless Sharing",
             description:
-                "Share your snippets with the world or keep them private in your secure personal vault.",
+                "Share snippets with your team or make them public for the developer community.",
             color: "#ec4899",
-            bgColor: "rgba(236, 72, 153, 0.1)",
         },
         {
             icon: <Security />,
-            title: "Bank-Level Security",
+            title: "Secure & Private",
             description:
                 "Your code is protected with enterprise-grade security and encrypted storage.",
             color: "#f59e0b",
-            bgColor: "rgba(245, 158, 11, 0.1)",
         },
     ];
 
     const stats = [
         {
-            number: "50K+",
+            number: "15K+",
             label: "Code Snippets",
             icon: <Code />,
-            color: "#6366f1",
+            color: "#3b82f6",
         },
         {
-            number: "2.5K+",
-            label: "Happy Developers",
+            number: "3.2K+",
+            label: "Developers",
             icon: <Star />,
             color: "#ec4899",
         },
         {
-            number: "100+",
-            label: "Programming Languages",
+            number: "85+",
+            label: "Languages",
             icon: <Speed />,
             color: "#10b981",
         },
@@ -89,213 +160,234 @@ const Home = ({ user }) => {
 
     return (
         <Container maxWidth="xl" sx={{ py: 4 }}>
-            {/* Hero Section */}
+            {/* Hero Section with Better Spacing */}
             <Box
-                className="hero-section"
-                textAlign="center"
-                position="relative"
+                sx={{
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "16px",
+                    padding: { xs: "40px 24px", md: "60px 32px" },
+                    marginBottom: "48px", // Increased spacing
+                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+                    textAlign: "center",
+                }}
             >
-                <Box sx={{ position: "relative", zIndex: 1 }}>
-                    <Chip
-                        icon={<AutoAwesome />}
-                        label="✨ The Future of Code Management"
-                        sx={{
-                            mb: 3,
-                            background:
-                                "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1))",
-                            border: "1px solid rgba(99, 102, 241, 0.2)",
-                            color: "#6366f1",
-                            fontWeight: 500,
-                            px: 2,
-                            py: 0.5,
-                        }}
-                    />
-                    <Typography
-                        variant="h1"
-                        component="h1"
-                        sx={{
-                            fontSize: {
-                                xs: "2.5rem",
-                                sm: "3.5rem",
-                                md: "4.5rem",
-                            },
-                            fontWeight: 800,
-                            mb: 3,
-                            background:
-                                "linear-gradient(135deg, #1f2937 0%, #6366f1 50%, #ec4899 100%)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            letterSpacing: "-0.02em",
-                        }}
-                    >
-                    All Your Code Snippets<br/>At One Place<br />
-                    </Typography>
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            color: "#6b7280",
-                            mb: 4,
-                            maxWidth: "600px",
-                            mx: "auto",
-                            lineHeight: 1.6,
-                            fontSize: { xs: "1.1rem", md: "1.25rem" },
-                            fontWeight: 400,
-                        }}
-                    >
-                        Store, organize, and share your code snippets with our
-                        beautiful, intuitive platform designed for modern
-                        developers.
-                    </Typography>
+                {/* Typing Effect Title */}
+                <TypingEffect />
 
-                    {user ? (
-                        <Box>
-                            <Chip
-                                label={`Welcome back, ${
-                                    user.firstName || user.username
-                                }! 🎉`}
-                                avatar={
-                                    <Avatar
-                                        sx={{
-                                            bgcolor: "#10b981",
-                                            width: 24,
-                                            height: 24,
-                                        }}
-                                    >
-                                        {user.username?.charAt(0).toUpperCase()}
-                                    </Avatar>
-                                }
-                                sx={{
-                                    mb: 4,
-                                    background:
-                                        "linear-gradient(135deg, #10b981, #059669)",
-                                    color: "white",
-                                    fontSize: "1rem",
-                                    py: 2,
-                                    px: 3,
-                                    fontWeight: 600,
-                                }}
-                            />
-                            <Box>
-                                <Button
-                                    variant="contained"
-                                    size="large"
-                                    onClick={() => navigate("/dashboard")}
-                                    startIcon={<Rocket />}
-                                    sx={{
-                                        fontSize: "1.1rem",
-                                        py: 2,
-                                        px: 4,
-                                        borderRadius: "12px",
-                                        background:
-                                            "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                                        boxShadow:
-                                            "0 8px 25px rgba(99, 102, 241, 0.3)",
-                                        "&:hover": {
-                                            background:
-                                                "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-                                            transform: "translateY(-2px)",
-                                            boxShadow:
-                                                "0 12px 35px rgba(99, 102, 241, 0.4)",
-                                        },
-                                    }}
-                                >
-                                    Open Dashboard
-                                </Button>
-                            </Box>
-                        </Box>
-                    ) : (
-                        <Box
-                            display="flex"
-                            gap={2}
-                            justifyContent="center"
-                            flexWrap="wrap"
+                <Typography
+                    variant="h5"
+                    sx={{
+                        color: "#6b7280",
+                        mb: 6, // Increased spacing
+                        fontSize: { xs: "1.1rem", md: "1.25rem" },
+                        maxWidth: "600px",
+                        mx: "auto",
+                        lineHeight: 1.6,
+                    }}
+                >
+                    The modern way to store, organize, and share your code
+                    snippets. Built for developers who value efficiency and
+                    clean code.
+                </Typography>
+
+                {user ? (
+                    <Box>
+                        <Chip
+                            label={`Welcome back, ${
+                                user.firstName || user.username
+                            }!`}
+                            sx={{
+                                mb: 4, // Increased spacing
+                                backgroundColor: "#ecfdf5",
+                                color: "#059669",
+                                fontWeight: 600,
+                                border: "1px solid #a7f3d0",
+                                fontSize: "1rem",
+                                py: 1,
+                                px: 2,
+                            }}
+                        />
+                        <Button
+                            variant="contained"
+                            size="large"
+                            onClick={() => navigate("/dashboard")}
+                            startIcon={<Rocket />}
+                            sx={{
+                                fontSize: "1.1rem",
+                                py: 1.5,
+                                px: 4,
+                                borderRadius: "10px",
+                                backgroundColor: "#3b82f6",
+                                "&:hover": {
+                                    backgroundColor: "#2563eb",
+                                },
+                            }}
                         >
-                            <Button
-                                variant="contained"
-                                size="large"
-                                onClick={() => navigate("/")} // This would trigger signup
-                                sx={{
-                                    fontSize: "1.1rem",
-                                    py: 2,
-                                    px: 4,
-                                    borderRadius: "12px",
-                                    background:
-                                        "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                                    boxShadow:
-                                        "0 8px 25px rgba(99, 102, 241, 0.3)",
-                                    "&:hover": {
-                                        background:
-                                            "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-                                        transform: "translateY(-2px)",
-                                        boxShadow:
-                                            "0 12px 35px rgba(99, 102, 241, 0.4)",
-                                    },
-                                }}
-                            >
-                                Get Started Free
-                            </Button>
-                            <Button
-                                variant="outlined"
-                                size="large"
-                                sx={{
-                                    fontSize: "1.1rem",
-                                    py: 2,
-                                    px: 4,
-                                    borderRadius: "12px",
-                                    borderColor: "rgba(99, 102, 241, 0.3)",
-                                    color: "#6366f1",
-                                    "&:hover": {
-                                        borderColor: "#6366f1",
-                                        backgroundColor:
-                                            "rgba(99, 102, 241, 0.04)",
-                                        transform: "translateY(-1px)",
-                                    },
-                                }}
-                            >
-                                View Demo
-                            </Button>
-                        </Box>
-                    )}
-                </Box>
+                            Open Dashboard
+                        </Button>
+                    </Box>
+                ) : (
+                    <Box
+                        display="flex"
+                        gap={3}
+                        justifyContent="center"
+                        flexWrap="wrap"
+                    >
+                        <Button
+                            variant="contained"
+                            size="large"
+                            sx={{
+                                fontSize: "1.1rem",
+                                py: 1.5,
+                                px: 4,
+                                borderRadius: "10px",
+                                backgroundColor: "#3b82f6",
+                                "&:hover": {
+                                    backgroundColor: "#2563eb",
+                                },
+                            }}
+                        >
+                            Get Started Free
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            size="large"
+                            sx={{
+                                fontSize: "1.1rem",
+                                py: 1.5,
+                                px: 4,
+                                borderRadius: "10px",
+                                borderColor: "#d1d5db",
+                                color: "#374151",
+                                "&:hover": {
+                                    borderColor: "#3b82f6",
+                                    backgroundColor: "rgba(59, 130, 246, 0.05)",
+                                    color: "#3b82f6",
+                                },
+                            }}
+                        >
+                            View Demo
+                        </Button>
+                    </Box>
+                )}
             </Box>
 
-            {/* Stats Section */}
-            <Box py={6}>
-                <Grid container spacing={3}>
+            {/* Stats Section with Better Spacing */}
+            <Box sx={{ py: 8 }}>
+                {" "}
+                {/* Increased spacing */}
+                <Typography
+                    variant="h3"
+                    textAlign="center"
+                    sx={{
+                        fontWeight: 700,
+                        mb: 3,
+                        color: "#1f2937",
+                    }}
+                >
+                    Trusted by Developers Worldwide
+                </Typography>
+                <Typography
+                    variant="h6"
+                    textAlign="center"
+                    sx={{
+                        color: "#6b7280",
+                        mb: 8, // Increased spacing
+                        fontWeight: 400,
+                        maxWidth: "500px",
+                        mx: "auto",
+                    }}
+                >
+                    Join thousands of developers who trust Snippetify for their
+                    code management needs
+                </Typography>
+                <Grid
+                    container
+                    spacing={4}
+                    justifyContent="center"
+                    sx={{ maxWidth: "1200px", mx: "auto" }}
+                >
                     {stats.map((stat, index) => (
-                        <Grid item xs={6} md={3} key={index}>
-                            <Paper className="stats-card" elevation={0}>
+                        <Grid item xs={12} sm={6} md={3} key={index}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    backgroundColor: "#ffffff",
+                                    border: "1px solid #e5e7eb",
+                                    borderRadius: "16px",
+                                    p: 4,
+                                    textAlign: "center",
+                                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+                                    height: "100%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                    position: "relative",
+                                    overflow: "hidden",
+                                    transition:
+                                        "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                    "&:hover": {
+                                        borderColor: stat.color,
+                                        boxShadow: `0 8px 30px ${stat.color}15`,
+                                        transform: "translateY(-2px)",
+                                    },
+                                    "&::before": {
+                                        content: '""',
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: "3px",
+                                        background: `linear-gradient(90deg, ${stat.color}, ${stat.color}80)`,
+                                        borderRadius: "16px 16px 0 0",
+                                    },
+                                }}
+                            >
+                                {/* Icon Container */}
                                 <Box
                                     sx={{
-                                        color: stat.color,
-                                        mb: 2,
-                                        p: 1,
-                                        borderRadius: "12px",
-                                        backgroundColor: `${stat.color}15`,
-                                        display: "inline-flex",
+                                        width: 80,
+                                        height: 80,
+                                        borderRadius: "20px",
+                                        background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}08)`,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        mb: 3,
+                                        border: `1px solid ${stat.color}20`,
                                     }}
                                 >
                                     {React.cloneElement(stat.icon, {
-                                        fontSize: "large",
+                                        sx: {
+                                            fontSize: "36px",
+                                            color: stat.color,
+                                        },
                                     })}
                                 </Box>
+
+                                {/* Number */}
                                 <Typography
-                                    variant="h3"
+                                    variant="h2"
                                     sx={{
                                         color: "#1f2937",
                                         fontWeight: 800,
-                                        mb: 1,
-                                        fontSize: { xs: "2rem", md: "2.5rem" },
+                                        mb: 2,
+                                        fontSize: { xs: "2.5rem", md: "3rem" },
+                                        lineHeight: 1,
                                     }}
                                 >
                                     {stat.number}
                                 </Typography>
+
+                                {/* Label */}
                                 <Typography
-                                    variant="body1"
+                                    variant="h6"
                                     sx={{
                                         color: "#6b7280",
                                         fontWeight: 500,
-                                        fontSize: "0.95rem",
+                                        fontSize: "1.1rem",
+                                        textAlign: "center",
                                     }}
                                 >
                                     {stat.label}
@@ -306,18 +398,19 @@ const Home = ({ user }) => {
                 </Grid>
             </Box>
 
-            {/* Features Section */}
-            <Box py={8}>
-                <Box textAlign="center" mb={6}>
+            {/* Features Section with Better Spacing */}
+            <Box sx={{ py: 8 }}>
+                {" "}
+                {/* Increased spacing */}
+                <Box textAlign="center" mb={8}>
+                    {" "}
+                    {/* Increased spacing */}
                     <Typography
-                        variant="h2"
+                        variant="h3"
                         sx={{
                             fontWeight: 700,
                             mb: 3,
-                            background:
-                                "linear-gradient(135deg, #1f2937 0%, #6366f1 100%)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
+                            color: "#1f2937",
                         }}
                     >
                         Why Developers Love Us
@@ -327,24 +420,62 @@ const Home = ({ user }) => {
                         sx={{
                             color: "#6b7280",
                             fontWeight: 400,
-                            maxWidth: "500px",
+                            maxWidth: "600px",
                             mx: "auto",
+                            lineHeight: 1.6,
                         }}
                     >
                         Everything you need to manage your code snippets
-                        beautifully and efficiently.
+                        efficiently and beautifully.
                     </Typography>
                 </Box>
-                <Grid container spacing={4}>
+                <Grid
+                    container
+                    spacing={4}
+                    justifyContent="center"
+                    alignItems="stretch"
+                >
                     {features.map((feature, index) => (
                         <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Paper className="feature-card" elevation={0}>
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    backgroundColor: "#ffffff",
+                                    border: "1px solid #e5e7eb",
+                                    borderRadius: "16px",
+                                    p: 3,
+                                    textAlign: "center",
+                                    height: "100%",
+                                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    position: "relative",
+                                    overflow: "hidden",
+                                    transition:
+                                        "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                    "&:hover": {
+                                        borderColor: feature.color,
+                                        boxShadow: `0 8px 25px ${feature.color}20`,
+                                    },
+                                    "&::before": {
+                                        content: '""',
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        height: "4px",
+                                        background: feature.color,
+                                        borderRadius: "16px 16px 0 0",
+                                    },
+                                }}
+                            >
+                                {/* Icon Container */}
                                 <Box
                                     sx={{
-                                        width: 64,
-                                        height: 64,
+                                        width: 72,
+                                        height: 72,
                                         borderRadius: "16px",
-                                        background: feature.bgColor,
+                                        background: `${feature.color}15`,
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
@@ -355,24 +486,31 @@ const Home = ({ user }) => {
                                 >
                                     {React.cloneElement(feature.icon, {
                                         fontSize: "large",
+                                        sx: { fontSize: "32px" },
                                     })}
                                 </Box>
+
+                                {/* Title */}
                                 <Typography
                                     variant="h6"
                                     sx={{
                                         color: "#1f2937",
                                         mb: 2,
                                         fontWeight: 600,
+                                        fontSize: "1.125rem",
                                     }}
                                 >
                                     {feature.title}
                                 </Typography>
+
+                                {/* Description */}
                                 <Typography
-                                    variant="body2"
+                                    variant="body1"
                                     sx={{
                                         color: "#6b7280",
                                         lineHeight: 1.6,
                                         fontSize: "0.95rem",
+                                        flexGrow: 1,
                                     }}
                                 >
                                     {feature.description}
@@ -383,41 +521,38 @@ const Home = ({ user }) => {
                 </Grid>
             </Box>
 
-            {/* CTA Section */}
+            {/* CTA Section with Better Spacing */}
             <Box
                 textAlign="center"
-                py={10}
+                py={10} // Increased spacing
                 sx={{
-                    background:
-                        "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.05) 100%)",
-                    borderRadius: "24px",
-                    border: "1px solid rgba(99, 102, 241, 0.1)",
-                    position: "relative",
-                    overflow: "hidden",
+                    backgroundColor: "#f8fafc",
+                    borderRadius: "16px",
+                    border: "1px solid #e5e7eb",
+                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+                    mt: 4, // Added top margin
                 }}
             >
                 <Typography
                     variant="h3"
                     sx={{
-                        mb: 3,
+                        mb: 4, // Increased spacing
                         fontWeight: 700,
-                        background:
-                            "linear-gradient(135deg, #1f2937 0%, #6366f1 100%)",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
+                        color: "#1f2937",
                     }}
                 >
-                    Ready to Transform Your Workflow?
+                    Ready to Get Started?
                 </Typography>
                 <Typography
                     variant="h6"
                     sx={{
                         color: "#6b7280",
-                        mb: 4,
+                        mb: 6, // Increased spacing
                         fontWeight: 400,
                     }}
                 >
-                    Join thousands of developers who've already made the switch
+                    Join thousands of developers using Snippetify to organize
+                    their code
                 </Typography>
                 {!user && (
                     <Button
@@ -425,18 +560,12 @@ const Home = ({ user }) => {
                         size="large"
                         sx={{
                             fontSize: "1.1rem",
-                            py: 2,
+                            py: 1.5,
                             px: 6,
-                            borderRadius: "12px",
-                            background:
-                                "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                            boxShadow: "0 8px 25px rgba(99, 102, 241, 0.3)",
+                            borderRadius: "10px",
+                            backgroundColor: "#3b82f6",
                             "&:hover": {
-                                background:
-                                    "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-                                transform: "translateY(-2px)",
-                                boxShadow:
-                                    "0 12px 35px rgba(99, 102, 241, 0.4)",
+                                backgroundColor: "#2563eb",
                             },
                         }}
                         startIcon={<Star />}

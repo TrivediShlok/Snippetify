@@ -4,13 +4,14 @@ import {
     Typography,
     Button,
     CircularProgress,
-    Divider,
     TextField,
     Grid,
     FormControl,
     InputLabel,
     Select,
     MenuItem,
+    Paper,
+    Container,
 } from "@mui/material";
 import { Add, Search } from "@mui/icons-material";
 import { snippetService } from "../services/snippetService";
@@ -33,7 +34,6 @@ const Dashboard = ({ user }) => {
             const params = {};
             if (searchTerm) params.search = searchTerm;
             if (languageFilter) params.language = languageFilter;
-
             const response = await snippetService.getSnippets(params);
             setSnippets(response.snippets || []);
         } catch (error) {
@@ -96,90 +96,154 @@ const Dashboard = ({ user }) => {
     ];
 
     return (
-        <Box>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={3}
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+            {/* Header */}
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    mb: 3,
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "12px",
+                }}
             >
-                <Typography variant="h4">
-                    My Snippets ({snippets.length})
-                </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => {
-                        setEditSnippet(null);
-                        setShowEditor(true);
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flexWrap: "wrap",
+                        gap: 2,
+                        mb: 3,
                     }}
                 >
-                    New Snippet
-                </Button>
-            </Box>
-
-            {/* Search and Filter */}
-            <Grid container spacing={2} sx={{ mb: 3 }}>
-                <Grid item xs={12} md={8}>
-                    <TextField
-                        fullWidth
-                        label="Search snippets..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        InputProps={{
-                            startAdornment: (
-                                <Search
-                                    sx={{ mr: 1, color: "text.secondary" }}
-                                />
-                            ),
+                    <Typography
+                        variant="h4"
+                        sx={{ fontWeight: 600, color: "#1f2937" }}
+                    >
+                        My Snippets ({snippets.length})
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => {
+                            setEditSnippet(null);
+                            setShowEditor(true);
                         }}
-                    />
-                </Grid>
-                <Grid item xs={12} md={4}>
-                    <FormControl fullWidth>
-                        <InputLabel>Filter by Language</InputLabel>
-                        <Select
-                            value={languageFilter}
-                            onChange={(e) => setLanguageFilter(e.target.value)}
-                            label="Filter by Language"
-                        >
-                            <MenuItem value="">All Languages</MenuItem>
-                            {languages.map((lang) => (
-                                <MenuItem key={lang} value={lang}>
-                                    {lang.toUpperCase()}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Grid>
-            </Grid>
+                        sx={{
+                            backgroundColor: "#3b82f6",
+                            "&:hover": {
+                                backgroundColor: "#2563eb",
+                            },
+                        }}
+                    >
+                        New Snippet
+                    </Button>
+                </Box>
 
-            <Divider sx={{ mb: 3 }} />
+                {/* Search and Filter */}
+                <Grid container spacing={2}>
+                    <Grid item xs={12} md={8}>
+                        <TextField
+                            fullWidth
+                            placeholder="Search snippets..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            InputProps={{
+                                startAdornment: (
+                                    <Search sx={{ mr: 1, color: "#6b7280" }} />
+                                ),
+                            }}
+                            sx={{
+                                "& .MuiOutlinedInput-root": {
+                                    backgroundColor: "#ffffff",
+                                },
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4}>
+                        <FormControl fullWidth>
+                            <InputLabel>Filter by Language</InputLabel>
+                            <Select
+                                value={languageFilter}
+                                onChange={(e) =>
+                                    setLanguageFilter(e.target.value)
+                                }
+                                label="Filter by Language"
+                                sx={{
+                                    backgroundColor: "#ffffff",
+                                }}
+                            >
+                                <MenuItem value="">All Languages</MenuItem>
+                                {languages.map((lang) => (
+                                    <MenuItem key={lang} value={lang}>
+                                        {lang.toUpperCase()}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                </Grid>
+            </Paper>
 
             {/* Snippet Editor */}
             {showEditor && (
-                <SnippetEditor
-                    initialData={editSnippet}
-                    isEditing={!!editSnippet}
-                    isSaving={saving}
-                    onSave={handleSave}
-                    onCancel={handleCancel}
-                />
+                <Box sx={{ mb: 3 }}>
+                    <SnippetEditor
+                        initialData={editSnippet}
+                        isEditing={!!editSnippet}
+                        isSaving={saving}
+                        onSave={handleSave}
+                        onCancel={handleCancel}
+                    />
+                </Box>
             )}
 
             {/* Snippets List */}
-            {loading ? (
-                <Box display="flex" justifyContent="center" py={4}>
-                    <CircularProgress />
-                </Box>
-            ) : (
-                <SnippetList
-                    snippets={snippets}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                />
-            )}
-        </Box>
+            <Paper
+                elevation={0}
+                sx={{
+                    p: 3,
+                    backgroundColor: "#ffffff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "12px",
+                }}
+            >
+                {loading ? (
+                    <Box
+                        sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            py: 8,
+                        }}
+                    >
+                        <CircularProgress />
+                    </Box>
+                ) : snippets.length === 0 ? (
+                    <Box className="empty-state">
+                        <Typography
+                            variant="h6"
+                            sx={{ mb: 1, color: "#374151" }}
+                        >
+                            No snippets found
+                        </Typography>
+                        <Typography sx={{ color: "#6b7280" }}>
+                            {searchTerm || languageFilter
+                                ? "Try adjusting your search or filter criteria."
+                                : "Create your first snippet to get started!"}
+                        </Typography>
+                    </Box>
+                ) : (
+                    <SnippetList
+                        snippets={snippets}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                    />
+                )}
+            </Paper>
+        </Container>
     );
 };
 
