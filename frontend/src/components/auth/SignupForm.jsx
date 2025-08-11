@@ -3,208 +3,197 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
+    DialogActions,
     TextField,
     Button,
     Box,
     Typography,
-    Link,
+    IconButton,
     Alert,
     CircularProgress,
-    Grid,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { Close } from "@mui/icons-material";
 import { authService } from "../../services/authService";
 
 const SignupForm = ({ open, onClose, onSuccess, onSwitchToLogin }) => {
+    const [formData, setFormData] = useState({
+        username: "",
+        email: "",
+        password: "",
+        firstName: "",
+        lastName: "",
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-        watch,
-    } = useForm();
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+        // Clear error when user starts typing
+        if (error) setError("");
+    };
 
-    const password = watch("password");
-
-    const onSubmit = async (data) => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setLoading(true);
         setError("");
 
         try {
-            const response = await authService.register(data);
-            toast.success("Account created successfully!");
-            onSuccess(response);
-            reset();
+            const response = await authService.register(formData);
+
+            if (response.success) {
+                onSuccess(response.data);
+                setFormData({
+                    username: "",
+                    email: "",
+                    password: "",
+                    firstName: "",
+                    lastName: "",
+                });
+            }
         } catch (error) {
-            setError(error.response?.data?.message || "Registration failed");
+            setError(error.message || "Registration failed. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
     const handleClose = () => {
-        reset();
+        setFormData({
+            username: "",
+            email: "",
+            password: "",
+            firstName: "",
+            lastName: "",
+        });
         setError("");
         onClose();
     };
 
     return (
-        <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-            <DialogTitle>Create Your Account</DialogTitle>
-            <DialogContent>
-                <Box
-                    component="form"
-                    onSubmit={handleSubmit(onSubmit)}
-                    sx={{ mt: 1 }}
+        <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+            <DialogTitle
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                }}
+            >
+                <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{ fontWeight: 600 }}
                 >
+                    Join Snippetify
+                </Typography>
+                <IconButton onClick={handleClose}>
+                    <Close />
+                </IconButton>
+            </DialogTitle>
+
+            <form onSubmit={handleSubmit}>
+                <DialogContent>
                     {error && (
                         <Alert severity="error" sx={{ mb: 2 }}>
                             {error}
                         </Alert>
                     )}
 
-                    <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="First Name"
-                                margin="normal"
-                                {...register("firstName", {
-                                    maxLength: {
-                                        value: 50,
-                                        message:
-                                            "First name cannot exceed 50 characters",
-                                    },
-                                })}
-                                error={!!errors.firstName}
-                                helperText={errors.firstName?.message}
-                            />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Last Name"
-                                margin="normal"
-                                {...register("lastName", {
-                                    maxLength: {
-                                        value: 50,
-                                        message:
-                                            "Last name cannot exceed 50 characters",
-                                    },
-                                })}
-                                error={!!errors.lastName}
-                                helperText={errors.lastName?.message}
-                            />
-                        </Grid>
-                    </Grid>
+                    <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
+                        <TextField
+                            fullWidth
+                            label="First Name"
+                            name="firstName"
+                            value={formData.firstName}
+                            onChange={handleChange}
+                            disabled={loading}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Last Name"
+                            name="lastName"
+                            value={formData.lastName}
+                            onChange={handleChange}
+                            disabled={loading}
+                        />
+                    </Box>
 
                     <TextField
                         fullWidth
                         label="Username"
-                        margin="normal"
-                        {...register("username", {
-                            required: "Username is required",
-                            minLength: {
-                                value: 3,
-                                message:
-                                    "Username must be at least 3 characters",
-                            },
-                            maxLength: {
-                                value: 30,
-                                message: "Username cannot exceed 30 characters",
-                            },
-                            pattern: {
-                                value: /^[a-zA-Z0-9_]+$/,
-                                message:
-                                    "Username can only contain letters, numbers, and underscores",
-                            },
-                        })}
-                        error={!!errors.username}
-                        helperText={errors.username?.message}
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        required
+                        disabled={loading}
+                        sx={{ mb: 2 }}
+                        helperText="3-30 characters, letters, numbers, and underscores only"
                     />
 
                     <TextField
                         fullWidth
-                        label="Email"
+                        label="Email Address"
+                        name="email"
                         type="email"
-                        margin="normal"
-                        {...register("email", {
-                            required: "Email is required",
-                            pattern: {
-                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                message: "Invalid email address",
-                            },
-                        })}
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        disabled={loading}
+                        sx={{ mb: 2 }}
                     />
 
                     <TextField
                         fullWidth
                         label="Password"
+                        name="password"
                         type="password"
-                        margin="normal"
-                        {...register("password", {
-                            required: "Password is required",
-                            minLength: {
-                                value: 6,
-                                message:
-                                    "Password must be at least 6 characters",
-                            },
-                        })}
-                        error={!!errors.password}
-                        helperText={errors.password?.message}
-                    />
-
-                    <TextField
-                        fullWidth
-                        label="Confirm Password"
-                        type="password"
-                        margin="normal"
-                        {...register("confirmPassword", {
-                            required: "Please confirm your password",
-                            validate: (value) =>
-                                value === password || "Passwords do not match",
-                        })}
-                        error={!!errors.confirmPassword}
-                        helperText={errors.confirmPassword?.message}
-                    />
-
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
+                        value={formData.password}
+                        onChange={handleChange}
+                        required
                         disabled={loading}
-                    >
-                        {loading ? (
-                            <CircularProgress size={24} />
-                        ) : (
-                            "Create Account"
-                        )}
-                    </Button>
+                        sx={{ mb: 2 }}
+                        helperText="Minimum 6 characters"
+                    />
+                </DialogContent>
 
-                    <Box textAlign="center">
-                        <Typography variant="body2">
-                            Already have an account?{" "}
-                            <Link
-                                component="button"
-                                variant="body2"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    onSwitchToLogin();
-                                }}
-                            >
-                                Login here
-                            </Link>
-                        </Typography>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
+                    <Box sx={{ width: "100%" }}>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            disabled={loading}
+                            sx={{ mb: 2, py: 1.5 }}
+                        >
+                            {loading ? (
+                                <CircularProgress size={24} />
+                            ) : (
+                                "Create Account"
+                            )}
+                        </Button>
+
+                        <Box textAlign="center">
+                            <Typography variant="body2" color="text.secondary">
+                                Already have an account?{" "}
+                                <Button
+                                    variant="text"
+                                    onClick={onSwitchToLogin}
+                                    disabled={loading}
+                                    sx={{
+                                        textTransform: "none",
+                                        p: 0,
+                                        minWidth: "auto",
+                                    }}
+                                >
+                                    Sign in here
+                                </Button>
+                            </Typography>
+                        </Box>
                     </Box>
-                </Box>
-            </DialogContent>
+                </DialogActions>
+            </form>
         </Dialog>
     );
 };

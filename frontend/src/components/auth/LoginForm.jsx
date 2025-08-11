@@ -3,60 +3,83 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
+    DialogActions,
     TextField,
     Button,
     Box,
     Typography,
-    Link,
+    IconButton,
     Alert,
     CircularProgress,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { Close } from "@mui/icons-material";
 import { authService } from "../../services/authService";
 
 const LoginForm = ({ open, onClose, onSuccess, onSwitchToSignup }) => {
+    const [formData, setFormData] = useState({
+        email: "",
+        password: "",
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-    } = useForm();
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+        // Clear error when user starts typing
+        if (error) setError("");
+    };
 
-    const onSubmit = async (data) => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         setLoading(true);
         setError("");
 
         try {
-            const response = await authService.login(data);
-            toast.success("Login successful!");
-            onSuccess(response);
-            reset();
+            const response = await authService.login(formData);
+
+            if (response.success) {
+                onSuccess(response.data);
+                setFormData({ email: "", password: "" });
+            }
         } catch (error) {
-            setError(error.response?.data?.message || "Login failed");
+            setError(error.message || "Login failed. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
     const handleClose = () => {
-        reset();
+        setFormData({ email: "", password: "" });
         setError("");
         onClose();
     };
 
     return (
         <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Login to Snippetify</DialogTitle>
-            <DialogContent>
-                <Box
-                    component="form"
-                    onSubmit={handleSubmit(onSubmit)}
-                    sx={{ mt: 1 }}
+            <DialogTitle
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                }}
+            >
+                <Typography
+                    variant="h5"
+                    component="div"
+                    sx={{ fontWeight: 600 }}
                 >
+                    Sign In to Snippetify
+                </Typography>
+                <IconButton onClick={handleClose}>
+                    <Close />
+                </IconButton>
+            </DialogTitle>
+
+            <form onSubmit={handleSubmit}>
+                <DialogContent>
                     {error && (
                         <Alert severity="error" sx={{ mb: 2 }}>
                             {error}
@@ -65,59 +88,65 @@ const LoginForm = ({ open, onClose, onSuccess, onSwitchToSignup }) => {
 
                     <TextField
                         fullWidth
-                        label="Email"
+                        label="Email Address"
+                        name="email"
                         type="email"
-                        margin="normal"
-                        {...register("email", {
-                            required: "Email is required",
-                            pattern: {
-                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                message: "Invalid email address",
-                            },
-                        })}
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                        disabled={loading}
+                        sx={{ mb: 2 }}
                     />
 
                     <TextField
                         fullWidth
                         label="Password"
+                        name="password"
                         type="password"
-                        margin="normal"
-                        {...register("password", {
-                            required: "Password is required",
-                        })}
-                        error={!!errors.password}
-                        helperText={errors.password?.message}
-                    />
-
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
+                        value={formData.password}
+                        onChange={handleChange}
+                        required
                         disabled={loading}
-                    >
-                        {loading ? <CircularProgress size={24} /> : "Login"}
-                    </Button>
+                        sx={{ mb: 2 }}
+                    />
+                </DialogContent>
 
-                    <Box textAlign="center">
-                        <Typography variant="body2">
-                            Don't have an account?{" "}
-                            <Link
-                                component="button"
-                                variant="body2"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    onSwitchToSignup();
-                                }}
-                            >
-                                Sign up here
-                            </Link>
-                        </Typography>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
+                    <Box sx={{ width: "100%" }}>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            disabled={loading}
+                            sx={{ mb: 2, py: 1.5 }}
+                        >
+                            {loading ? (
+                                <CircularProgress size={24} />
+                            ) : (
+                                "Sign In"
+                            )}
+                        </Button>
+
+                        <Box textAlign="center">
+                            <Typography variant="body2" color="text.secondary">
+                                Don't have an account?{" "}
+                                <Button
+                                    variant="text"
+                                    onClick={onSwitchToSignup}
+                                    disabled={loading}
+                                    sx={{
+                                        textTransform: "none",
+                                        p: 0,
+                                        minWidth: "auto",
+                                    }}
+                                >
+                                    Sign up here
+                                </Button>
+                            </Typography>
+                        </Box>
                     </Box>
-                </Box>
-            </DialogContent>
+                </DialogActions>
+            </form>
         </Dialog>
     );
 };

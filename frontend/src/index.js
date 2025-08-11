@@ -7,7 +7,8 @@ import { Toaster } from "react-hot-toast";
 import App from "./App";
 import "./styles/globals.css";
 
-const theme = createTheme({
+// Create theme - EXPORT THIS
+export const theme = createTheme({
     palette: {
         mode: "light",
         primary: {
