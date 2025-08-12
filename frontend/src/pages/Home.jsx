@@ -27,8 +27,10 @@ import {
     Celebration,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../contexts/ThemeContext"; // Added theme import
 
 const TypingEffect = () => {
+    const { darkMode } = useTheme(); // Added dark mode context
     const messages = [
         "Snippetify",
         "One Stop Solution",
@@ -78,7 +80,7 @@ const TypingEffect = () => {
                 fontSize: { xs: "2.5rem", md: "3.5rem" },
                 fontWeight: 700,
                 mb: 2,
-                color: "#1f2937",
+                color: darkMode ? "#f1f5f9" : "#1f2937", // Dynamic color
                 minHeight: { xs: "80px", md: "100px" },
                 display: "flex",
                 alignItems: "center",
@@ -111,6 +113,7 @@ const TypingEffect = () => {
 
 const Home = ({ user }) => {
     const navigate = useNavigate();
+    const { darkMode } = useTheme(); // Added dark mode context
 
     const features = [
         {
@@ -171,460 +174,502 @@ const Home = ({ user }) => {
     ];
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
-            {/* Hero Section */}
-            <Fade in={true} timeout={1000}>
-                <Box
-                    sx={{
-                        backgroundColor: "#ffffff",
-                        border: "1px solid #e5e7eb",
-                        borderRadius: "24px",
-                        padding: { xs: "40px 24px", md: "60px 32px" },
-                        marginBottom: "48px",
-                        boxShadow:
-                            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                        textAlign: "center",
-                        background:
-                            "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                        position: "relative",
-                        overflow: "hidden",
-                        "&::before": {
-                            content: '""',
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background:
-                                "radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 50%)",
-                            pointerEvents: "none",
-                        },
-                    }}
-                >
-                    <Box sx={{ position: "relative", zIndex: 1 }}>
-                        {/* Typing Effect Title */}
-                        <TypingEffect />
+        <Box
+            sx={{
+                minHeight: "100vh",
+                backgroundColor: darkMode ? "#0f172a" : "#ffffff", // Dynamic background
+            }}
+        >
+            <Container maxWidth="xl" sx={{ py: 4 }}>
+                {/* Hero Section */}
+                <Fade in={true} timeout={1000}>
+                    <Box
+                        sx={{
+                            backgroundColor: darkMode ? "#1e293b" : "#ffffff", // Dynamic background
+                            border: `1px solid ${
+                                darkMode ? "#374151" : "#e5e7eb"
+                            }`, // Dynamic border
+                            borderRadius: "24px",
+                            padding: { xs: "40px 24px", md: "60px 32px" },
+                            marginBottom: "48px",
+                            boxShadow: darkMode
+                                ? "0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)"
+                                : "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)", // Dynamic shadow
+                            textAlign: "center",
+                            background: darkMode
+                                ? "linear-gradient(135deg, #1e293b 0%, #334155 100%)"
+                                : "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)", // Dynamic gradient
+                            position: "relative",
+                            overflow: "hidden",
+                            "&::before": {
+                                content: '""',
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: darkMode
+                                    ? "radial-gradient(circle at 30% 20%, rgba(102, 126, 234, 0.08) 0%, transparent 50%)"
+                                    : "radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 50%)", // Dynamic radial gradient
+                                pointerEvents: "none",
+                            },
+                        }}
+                    >
+                        <Box sx={{ position: "relative", zIndex: 1 }}>
+                            {/* Typing Effect Title */}
+                            <TypingEffect />
 
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                color: "#6b7280",
-                                mb: 6,
-                                fontSize: { xs: "1.1rem", md: "1.25rem" },
-                                maxWidth: "600px",
-                                mx: "auto",
-                                lineHeight: 1.6,
-                                opacity: 0.9,
-                            }}
-                        >
-                            The modern way to store, organize, and share your
-                            code snippets. Built for developers who value
-                            efficiency and clean code.
-                        </Typography>
+                            <Typography
+                                variant="h5"
+                                sx={{
+                                    color: darkMode ? "#94a3b8" : "#6b7280", // Dynamic color
+                                    mb: 6,
+                                    fontSize: { xs: "1.1rem", md: "1.25rem" },
+                                    maxWidth: "600px",
+                                    mx: "auto",
+                                    lineHeight: 1.6,
+                                    opacity: 0.9,
+                                }}
+                            >
+                                The modern way to store, organize, and share
+                                your code snippets. Built for developers who
+                                value efficiency and clean code.
+                            </Typography>
 
-                        {user ? (
-                            <Grow in={true} timeout={1200}>
-                                <Box>
-
-                                    {/* Enhanced Dashboard Button */}
+                            {user ? (
+                                <Grow in={true} timeout={1200}>
+                                    <Box>
+                                        {/* Enhanced Dashboard Button */}
+                                        <Button
+                                            variant="contained"
+                                            size="large"
+                                            onClick={() =>
+                                                navigate("/dashboard")
+                                            }
+                                            startIcon={<Dashboard />}
+                                            endIcon={<Rocket />}
+                                            sx={{
+                                                fontSize: "1.1rem",
+                                                fontWeight: 700,
+                                                py: 2,
+                                                px: 6,
+                                                borderRadius: "50px",
+                                                background:
+                                                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                                boxShadow:
+                                                    "0 10px 25px rgba(102, 126, 234, 0.4)",
+                                                textTransform: "none",
+                                                position: "relative",
+                                                overflow: "hidden",
+                                                transition:
+                                                    "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                                "&::before": {
+                                                    content: '""',
+                                                    position: "absolute",
+                                                    top: 0,
+                                                    left: "-100%",
+                                                    width: "100%",
+                                                    height: "100%",
+                                                    background:
+                                                        "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
+                                                    transition:
+                                                        "left 0.6s ease",
+                                                },
+                                                "&:hover": {
+                                                    transform:
+                                                        "translateY(-3px) scale(1.02)",
+                                                    boxShadow:
+                                                        "0 20px 40px rgba(102, 126, 234, 0.6)",
+                                                    "&::before": {
+                                                        left: "100%",
+                                                    },
+                                                },
+                                                "&:active": {
+                                                    transform:
+                                                        "translateY(-1px) scale(0.98)",
+                                                },
+                                            }}
+                                        >
+                                            Open Dashboard
+                                        </Button>
+                                    </Box>
+                                </Grow>
+                            ) : (
+                                <Box
+                                    display="flex"
+                                    gap={3}
+                                    justifyContent="center"
+                                    flexWrap="wrap"
+                                >
                                     <Button
                                         variant="contained"
                                         size="large"
-                                        onClick={() => navigate("/dashboard")}
-                                        startIcon={<Dashboard />}
-                                        endIcon={<Rocket />}
                                         sx={{
                                             fontSize: "1.1rem",
-                                            fontWeight: 700,
-                                            py: 2,
-                                            px: 6,
-                                            borderRadius: "50px",
+                                            py: 1.5,
+                                            px: 4,
+                                            borderRadius: "12px",
                                             background:
                                                 "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                                             boxShadow:
-                                                "0 10px 25px rgba(102, 126, 234, 0.4)",
-                                            textTransform: "none",
-                                            position: "relative",
-                                            overflow: "hidden",
-                                            transition:
-                                                "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                            "&::before": {
-                                                content: '""',
-                                                position: "absolute",
-                                                top: 0,
-                                                left: "-100%",
-                                                width: "100%",
-                                                height: "100%",
-                                                background:
-                                                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
-                                                transition: "left 0.6s ease",
-                                            },
+                                                "0 8px 25px rgba(102, 126, 234, 0.3)",
                                             "&:hover": {
-                                                transform:
-                                                    "translateY(-3px) scale(1.02)",
                                                 boxShadow:
-                                                    "0 20px 40px rgba(102, 126, 234, 0.6)",
-                                                "&::before": {
-                                                    left: "100%",
-                                                },
-                                            },
-                                            "&:active": {
-                                                transform:
-                                                    "translateY(-1px) scale(0.98)",
+                                                    "0 12px 35px rgba(102, 126, 234, 0.4)",
+                                                transform: "translateY(-2px)",
                                             },
                                         }}
                                     >
-                                        Open Dashboard
+                                        Get Started Free
+                                    </Button>
+                                    <Button
+                                        variant="outlined"
+                                        size="large"
+                                        sx={{
+                                            fontSize: "1.1rem",
+                                            py: 1.5,
+                                            px: 4,
+                                            borderRadius: "12px",
+                                            borderColor: darkMode
+                                                ? "#475569"
+                                                : "#d1d5db", // Dynamic border
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#374151", // Dynamic color
+                                            "&:hover": {
+                                                borderColor: "#667eea",
+                                                backgroundColor:
+                                                    "rgba(102, 126, 234, 0.05)",
+                                                color: "#667eea",
+                                            },
+                                        }}
+                                    >
+                                        View Demo
                                     </Button>
                                 </Box>
-                            </Grow>
-                        ) : (
-                            <Box
-                                display="flex"
-                                gap={3}
-                                justifyContent="center"
-                                flexWrap="wrap"
-                            >
-                                <Button
-                                    variant="contained"
-                                    size="large"
+                            )}
+                        </Box>
+                    </Box>
+                </Fade>
+
+                {/* Stats Section with Better Spacing */}
+                <Box sx={{ py: 8 }}>
+                    <Typography
+                        variant="h3"
+                        textAlign="center"
+                        sx={{
+                            fontWeight: 700,
+                            mb: 2,
+                            color: darkMode ? "#f1f5f9" : "#1f2937", // Dynamic color
+                        }}
+                    >
+                        Trusted by Developers Worldwide
+                    </Typography>
+                    <Typography
+                        variant="h6"
+                        textAlign="center"
+                        sx={{
+                            color: darkMode ? "#94a3b8" : "#6b7280", // Dynamic color
+                            mb: 8,
+                            fontWeight: 400,
+                            maxWidth: "500px",
+                            mx: "auto",
+                        }}
+                    >
+                        Join thousands of developers who trust Snippetify for
+                        their code management needs
+                    </Typography>
+
+                    <Grid container spacing={4} justifyContent="center">
+                        {stats.map((stat, index) => (
+                            <Grid item xs={12} sm={6} md={3} key={index}>
+                                <Paper
+                                    elevation={0}
                                     sx={{
-                                        fontSize: "1.1rem",
-                                        py: 1.5,
-                                        px: 4,
-                                        borderRadius: "12px",
-                                        background:
-                                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                        boxShadow:
-                                            "0 8px 25px rgba(102, 126, 234, 0.3)",
+                                        backgroundColor: darkMode
+                                            ? "#1e293b"
+                                            : "#ffffff", // Dynamic background
+                                        border: `1px solid ${
+                                            darkMode ? "#374151" : "#e5e7eb"
+                                        }`, // Dynamic border
+                                        borderRadius: "16px",
+                                        p: 4,
+                                        textAlign: "center",
+                                        boxShadow: darkMode
+                                            ? "0 1px 3px 0 rgba(0, 0, 0, 0.2)"
+                                            : "0 1px 3px 0 rgba(0, 0, 0, 0.1)", // Dynamic shadow
+                                        height: "100%",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        position: "relative",
+                                        overflow: "hidden",
+                                        transition:
+                                            "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                                         "&:hover": {
-                                            boxShadow:
-                                                "0 12px 35px rgba(102, 126, 234, 0.4)",
+                                            borderColor: stat.color,
+                                            boxShadow: `0 8px 30px ${stat.color}15`,
                                             transform: "translateY(-2px)",
                                         },
-                                    }}
-                                >
-                                    Get Started Free
-                                </Button>
-                                <Button
-                                    variant="outlined"
-                                    size="large"
-                                    sx={{
-                                        fontSize: "1.1rem",
-                                        py: 1.5,
-                                        px: 4,
-                                        borderRadius: "12px",
-                                        borderColor: "#d1d5db",
-                                        color: "#374151",
-                                        "&:hover": {
-                                            borderColor: "#667eea",
-                                            backgroundColor:
-                                                "rgba(102, 126, 234, 0.05)",
-                                            color: "#667eea",
+                                        "&::before": {
+                                            content: '""',
+                                            position: "absolute",
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            height: "3px",
+                                            background: `linear-gradient(90deg, ${stat.color}, ${stat.color}80)`,
+                                            borderRadius: "16px 16px 0 0",
                                         },
                                     }}
                                 >
-                                    View Demo
-                                </Button>
-                            </Box>
-                        )}
-                    </Box>
+                                    <Box
+                                        sx={{
+                                            width: 80,
+                                            height: 80,
+                                            borderRadius: "20px",
+                                            background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}08)`,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            mb: 3,
+                                            border: `1px solid ${stat.color}20`,
+                                        }}
+                                    >
+                                        {React.cloneElement(stat.icon, {
+                                            sx: {
+                                                fontSize: "36px",
+                                                color: stat.color,
+                                            },
+                                        })}
+                                    </Box>
+
+                                    <Typography
+                                        variant="h2"
+                                        sx={{
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937", // Dynamic color
+                                            fontWeight: 800,
+                                            mb: 2,
+                                            fontSize: {
+                                                xs: "2.5rem",
+                                                md: "3rem",
+                                            },
+                                            lineHeight: 1,
+                                        }}
+                                    >
+                                        {stat.number}
+                                    </Typography>
+
+                                    <Typography
+                                        variant="h6"
+                                        sx={{
+                                            color: darkMode
+                                                ? "#94a3b8"
+                                                : "#6b7280", // Dynamic color
+                                            fontWeight: 500,
+                                            fontSize: "1.1rem",
+                                            textAlign: "center",
+                                        }}
+                                    >
+                                        {stat.label}
+                                    </Typography>
+                                </Paper>
+                            </Grid>
+                        ))}
+                    </Grid>
                 </Box>
-            </Fade>
 
-            {/* Stats Section with Better Spacing */}
-            <Box sx={{ py: 8 }}>
-                <Typography
-                    variant="h3"
-                    textAlign="center"
-                    sx={{
-                        fontWeight: 700,
-                        mb: 2,
-                        color: "#1f2937",
-                    }}
-                >
-                    Trusted by Developers Worldwide
-                </Typography>
-                <Typography
-                    variant="h6"
-                    textAlign="center"
-                    sx={{
-                        color: "#6b7280",
-                        mb: 8,
-                        fontWeight: 400,
-                        maxWidth: "500px",
-                        mx: "auto",
-                    }}
-                >
-                    Join thousands of developers who trust Snippetify for their
-                    code management needs
-                </Typography>
+                {/* Features Section */}
+                <Box sx={{ py: 8 }}>
+                    <Box textAlign="center" mb={8}>
+                        <Typography
+                            variant="h3"
+                            sx={{
+                                fontWeight: 700,
+                                mb: 3,
+                                color: darkMode ? "#f1f5f9" : "#1f2937", // Dynamic color
+                            }}
+                        >
+                            Why Developers Love Us
+                        </Typography>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: darkMode ? "#94a3b8" : "#6b7280", // Dynamic color
+                                fontWeight: 400,
+                                maxWidth: "600px",
+                                mx: "auto",
+                                lineHeight: 1.6,
+                            }}
+                        >
+                            Everything you need to manage your code snippets
+                            efficiently and beautifully.
+                        </Typography>
+                    </Box>
 
-                <Grid container spacing={4} justifyContent="center">
-                    {stats.map((stat, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    backgroundColor: "#ffffff",
-                                    border: "1px solid #e5e7eb",
-                                    borderRadius: "16px",
-                                    p: 4,
-                                    textAlign: "center",
-                                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-                                    height: "100%",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    position: "relative",
-                                    overflow: "hidden",
-                                    transition:
-                                        "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                    "&:hover": {
-                                        borderColor: stat.color,
-                                        boxShadow: `0 8px 30px ${stat.color}15`,
-                                        transform: "translateY(-2px)",
-                                    },
-                                    "&::before": {
-                                        content: '""',
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        height: "3px",
-                                        background: `linear-gradient(90deg, ${stat.color}, ${stat.color}80)`,
-                                        borderRadius: "16px 16px 0 0",
-                                    },
-                                }}
-                            >
-                                <Box
+                    <Grid
+                        container
+                        spacing={4}
+                        justifyContent="center"
+                        alignItems="stretch"
+                    >
+                        {features.map((feature, index) => (
+                            <Grid item xs={12} sm={6} md={3} key={index}>
+                                <Paper
+                                    elevation={0}
                                     sx={{
-                                        width: 80,
-                                        height: 80,
-                                        borderRadius: "20px",
-                                        background: `linear-gradient(135deg, ${stat.color}15, ${stat.color}08)`,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        mb: 3,
-                                        border: `1px solid ${stat.color}20`,
-                                    }}
-                                >
-                                    {React.cloneElement(stat.icon, {
-                                        sx: {
-                                            fontSize: "36px",
-                                            color: stat.color,
-                                        },
-                                    })}
-                                </Box>
-
-                                <Typography
-                                    variant="h2"
-                                    sx={{
-                                        color: "#1f2937",
-                                        fontWeight: 800,
-                                        mb: 2,
-                                        fontSize: { xs: "2.5rem", md: "3rem" },
-                                        lineHeight: 1,
-                                    }}
-                                >
-                                    {stat.number}
-                                </Typography>
-
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        color: "#6b7280",
-                                        fontWeight: 500,
-                                        fontSize: "1.1rem",
+                                        backgroundColor: darkMode
+                                            ? "#1e293b"
+                                            : "#ffffff", // Dynamic background
+                                        border: `1px solid ${
+                                            darkMode ? "#374151" : "#e5e7eb"
+                                        }`, // Dynamic border
+                                        borderRadius: "16px",
+                                        p: 3,
                                         textAlign: "center",
+                                        height: "100%",
+                                        boxShadow: darkMode
+                                            ? "0 1px 3px 0 rgba(0, 0, 0, 0.2)"
+                                            : "0 1px 3px 0 rgba(0, 0, 0, 0.1)", // Dynamic shadow
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        position: "relative",
+                                        overflow: "hidden",
+                                        transition:
+                                            "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                        "&:hover": {
+                                            borderColor: feature.color,
+                                            boxShadow: `0 8px 25px ${feature.color}20`,
+                                        },
+                                        "&::before": {
+                                            content: '""',
+                                            position: "absolute",
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            height: "4px",
+                                            background: feature.color,
+                                            borderRadius: "16px 16px 0 0",
+                                        },
                                     }}
                                 >
-                                    {stat.label}
-                                </Typography>
+                                    <Box
+                                        sx={{
+                                            width: 72,
+                                            height: 72,
+                                            borderRadius: "16px",
+                                            background: `${feature.color}15`,
+                                            display: "flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            mx: "auto",
+                                            mb: 3,
+                                            color: feature.color,
+                                        }}
+                                    >
+                                        {React.cloneElement(feature.icon, {
+                                            fontSize: "large",
+                                            sx: { fontSize: "32px" },
+                                        })}
+                                    </Box>
 
-                                
-                            </Paper>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+                                    <Typography
+                                        variant="h6"
+                                        sx={{
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937", // Dynamic color
+                                            mb: 2,
+                                            fontWeight: 600,
+                                            fontSize: "1.125rem",
+                                        }}
+                                    >
+                                        {feature.title}
+                                    </Typography>
 
-            {/* Features Section */}
-            <Box sx={{ py: 8 }}>
-                <Box textAlign="center" mb={8}>
+                                    <Typography
+                                        variant="body1"
+                                        sx={{
+                                            color: darkMode
+                                                ? "#94a3b8"
+                                                : "#6b7280", // Dynamic color
+                                            lineHeight: 1.6,
+                                            fontSize: "0.95rem",
+                                            flexGrow: 1,
+                                        }}
+                                    >
+                                        {feature.description}
+                                    </Typography>
+                                </Paper>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+
+                {/* CTA Section */}
+                <Box
+                    textAlign="center"
+                    py={10}
+                    sx={{
+                        backgroundColor: darkMode ? "#334155" : "#f8fafc", // Dynamic background
+                        borderRadius: "16px",
+                        border: `1px solid ${darkMode ? "#475569" : "#e5e7eb"}`, // Dynamic border
+                        boxShadow: darkMode
+                            ? "0 1px 3px 0 rgba(0, 0, 0, 0.2)"
+                            : "0 1px 3px 0 rgba(0, 0, 0, 0.1)", // Dynamic shadow
+                        mt: 4,
+                    }}
+                >
                     <Typography
                         variant="h3"
                         sx={{
+                            mb: 4,
                             fontWeight: 700,
-                            mb: 3,
-                            color: "#1f2937",
+                            color: darkMode ? "#f1f5f9" : "#1f2937", // Dynamic color
                         }}
                     >
-                        Why Developers Love Us
+                        Ready to Get Started?
                     </Typography>
                     <Typography
                         variant="h6"
                         sx={{
-                            color: "#6b7280",
+                            color: darkMode ? "#94a3b8" : "#6b7280", // Dynamic color
+                            mb: 6,
                             fontWeight: 400,
-                            maxWidth: "600px",
-                            mx: "auto",
-                            lineHeight: 1.6,
                         }}
                     >
-                        Everything you need to manage your code snippets
-                        efficiently and beautifully.
+                        Join thousands of developers using Snippetify to
+                        organize their code
                     </Typography>
-                </Box>
-
-                <Grid
-                    container
-                    spacing={4}
-                    justifyContent="center"
-                    alignItems="stretch"
-                >
-                    {features.map((feature, index) => (
-                        <Grid item xs={12} sm={6} md={3} key={index}>
-                            <Paper
-                                elevation={0}
-                                sx={{
-                                    backgroundColor: "#ffffff",
-                                    border: "1px solid #e5e7eb",
-                                    borderRadius: "16px",
-                                    p: 3,
-                                    textAlign: "center",
-                                    height: "100%",
-                                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    position: "relative",
-                                    overflow: "hidden",
-                                    transition:
-                                        "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                    "&:hover": {
-                                        borderColor: feature.color,
-                                        boxShadow: `0 8px 25px ${feature.color}20`,
-                                    },
-                                    "&::before": {
-                                        content: '""',
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        right: 0,
-                                        height: "4px",
-                                        background: feature.color,
-                                        borderRadius: "16px 16px 0 0",
-                                    },
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        width: 72,
-                                        height: 72,
-                                        borderRadius: "16px",
-                                        background: `${feature.color}15`,
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        mx: "auto",
-                                        mb: 3,
-                                        color: feature.color,
-                                    }}
-                                >
-                                    {React.cloneElement(feature.icon, {
-                                        fontSize: "large",
-                                        sx: { fontSize: "32px" },
-                                    })}
-                                </Box>
-
-                                <Typography
-                                    variant="h6"
-                                    sx={{
-                                        color: "#1f2937",
-                                        mb: 2,
-                                        fontWeight: 600,
-                                        fontSize: "1.125rem",
-                                    }}
-                                >
-                                    {feature.title}
-                                </Typography>
-
-                                <Typography
-                                    variant="body1"
-                                    sx={{
-                                        color: "#6b7280",
-                                        lineHeight: 1.6,
-                                        fontSize: "0.95rem",
-                                        flexGrow: 1,
-                                    }}
-                                >
-                                    {feature.description}
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
-
-            {/* CTA Section */}
-            <Box
-                textAlign="center"
-                py={10}
-                sx={{
-                    backgroundColor: "#f8fafc",
-                    borderRadius: "16px",
-                    border: "1px solid #e5e7eb",
-                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-                    mt: 4,
-                }}
-            >
-                <Typography
-                    variant="h3"
-                    sx={{
-                        mb: 4,
-                        fontWeight: 700,
-                        color: "#1f2937",
-                    }}
-                >
-                    Ready to Get Started?
-                </Typography>
-                <Typography
-                    variant="h6"
-                    sx={{
-                        color: "#6b7280",
-                        mb: 6,
-                        fontWeight: 400,
-                    }}
-                >
-                    Join thousands of developers using Snippetify to organize
-                    their code
-                </Typography>
-                {!user && (
-                    <Button
-                        variant="contained"
-                        size="large"
-                        sx={{
-                            fontSize: "1.1rem",
-                            py: 1.5,
-                            px: 6,
-                            borderRadius: "12px",
-                            background:
-                                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                            boxShadow: "0 8px 25px rgba(102, 126, 234, 0.3)",
-                            "&:hover": {
+                    {!user && (
+                        <Button
+                            variant="contained"
+                            size="large"
+                            sx={{
+                                fontSize: "1.1rem",
+                                py: 1.5,
+                                px: 6,
+                                borderRadius: "12px",
+                                background:
+                                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                                 boxShadow:
-                                    "0 12px 35px rgba(102, 126, 234, 0.4)",
-                                transform: "translateY(-2px)",
-                            },
-                        }}
-                        startIcon={<Star />}
-                    >
-                        Start Your Journey
-                    </Button>
-                )}
-            </Box>
-        </Container>
+                                    "0 8px 25px rgba(102, 126, 234, 0.3)",
+                                "&:hover": {
+                                    boxShadow:
+                                        "0 12px 35px rgba(102, 126, 234, 0.4)",
+                                    transform: "translateY(-2px)",
+                                },
+                            }}
+                            startIcon={<Star />}
+                        >
+                            Start Your Journey
+                        </Button>
+                    )}
+                </Box>
+            </Container>
+        </Box>
     );
 };
 

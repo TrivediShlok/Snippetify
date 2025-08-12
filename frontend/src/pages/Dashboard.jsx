@@ -26,12 +26,14 @@ import {
     Lock,
     Tune,
 } from "@mui/icons-material";
+import { useTheme } from "../contexts/ThemeContext";
 import { snippetService } from "../services/snippetService";
 import SnippetList from "../components/snippets/SnippetList";
 import SnippetEditor from "../components/snippets/SnippetEditor";
 import toast from "react-hot-toast";
 
 const Dashboard = ({ user }) => {
+    const { darkMode } = useTheme();
     const [snippets, setSnippets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showEditor, setShowEditor] = useState(false);
@@ -82,7 +84,12 @@ const Dashboard = ({ user }) => {
         } catch (error) {
             console.error("Load snippets error:", error);
             setError(error.message || "Failed to load snippets");
-            toast.error(error.message || "Failed to load snippets");
+            toast.error(error.message || "Failed to load snippets", {
+                style: {
+                    background: darkMode ? "#374151" : "#ffffff",
+                    color: darkMode ? "#f3f4f6" : "#1f2937",
+                },
+            });
             setSnippets([]);
         } finally {
             setLoading(false);
@@ -123,11 +130,21 @@ const Dashboard = ({ user }) => {
                     editSnippet._id,
                     data
                 );
-                toast.success("Snippet updated successfully!");
+                toast.success("Snippet updated successfully!", {
+                    style: {
+                        background: darkMode ? "#374151" : "#ffffff",
+                        color: darkMode ? "#f3f4f6" : "#1f2937",
+                    },
+                });
             } else {
                 console.log("Creating new snippet");
                 response = await snippetService.createSnippet(data);
-                toast.success("Snippet created successfully!");
+                toast.success("Snippet created successfully!", {
+                    style: {
+                        background: darkMode ? "#374151" : "#ffffff",
+                        color: darkMode ? "#f3f4f6" : "#1f2937",
+                    },
+                });
             }
 
             if (response.success) {
@@ -142,7 +159,12 @@ const Dashboard = ({ user }) => {
             const errorMessage =
                 error.message || "Failed to save snippet. Please try again.";
             setError(errorMessage);
-            toast.error(errorMessage);
+            toast.error(errorMessage, {
+                style: {
+                    background: darkMode ? "#374151" : "#ffffff",
+                    color: darkMode ? "#f3f4f6" : "#1f2937",
+                },
+            });
         } finally {
             setSaving(false);
         }
@@ -158,14 +180,24 @@ const Dashboard = ({ user }) => {
             const response = await snippetService.deleteSnippet(id);
 
             if (response.success) {
-                toast.success("Snippet deleted successfully!");
+                toast.success("Snippet deleted successfully!", {
+                    style: {
+                        background: darkMode ? "#374151" : "#ffffff",
+                        color: darkMode ? "#f3f4f6" : "#1f2937",
+                    },
+                });
                 await loadSnippets();
             } else {
                 throw new Error(response.message || "Failed to delete snippet");
             }
         } catch (error) {
             console.error("Delete snippet error:", error);
-            toast.error(error.message || "Failed to delete snippet");
+            toast.error(error.message || "Failed to delete snippet", {
+                style: {
+                    background: darkMode ? "#374151" : "#ffffff",
+                    color: darkMode ? "#f3f4f6" : "#1f2937",
+                },
+            });
         }
     };
 
@@ -190,11 +222,21 @@ const Dashboard = ({ user }) => {
                             : snippet
                     )
                 );
-                toast.success(response.message);
+                toast.success(response.message, {
+                    style: {
+                        background: darkMode ? "#374151" : "#ffffff",
+                        color: darkMode ? "#f3f4f6" : "#1f2937",
+                    },
+                });
             }
         } catch (error) {
             console.error("Toggle like error:", error);
-            toast.error(error.message || "Failed to toggle like");
+            toast.error(error.message || "Failed to toggle like", {
+                style: {
+                    background: darkMode ? "#374151" : "#ffffff",
+                    color: darkMode ? "#f3f4f6" : "#1f2937",
+                },
+            });
         }
     };
 
@@ -225,10 +267,12 @@ const Dashboard = ({ user }) => {
                 sx={{
                     p: 4,
                     mb: 4,
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e5e7eb",
+                    backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    border: `1px solid ${darkMode ? "#374151" : "#e5e7eb"}`,
                     borderRadius: "20px",
-                    boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+                    boxShadow: darkMode
+                        ? "0 8px 30px rgba(0,0,0,0.3)"
+                        : "0 8px 30px rgba(0,0,0,0.08)",
                 }}
             >
                 {/* Title Section */}
@@ -245,13 +289,20 @@ const Dashboard = ({ user }) => {
                     <Box>
                         <Typography
                             variant="h3"
-                            sx={{ fontWeight: 800, color: "#1f2937", mb: 1 }}
+                            sx={{
+                                fontWeight: 800,
+                                color: darkMode ? "#f1f5f9" : "#1f2937",
+                                mb: 1,
+                            }}
                         >
                             My Code Snippets
                         </Typography>
                         <Typography
                             variant="h6"
-                            sx={{ color: "#6b7280", fontWeight: 400 }}
+                            sx={{
+                                color: darkMode ? "#94a3b8" : "#6b7280",
+                                fontWeight: 400,
+                            }}
                         >
                             {pagination.total} snippet
                             {pagination.total !== 1 ? "s" : ""} in your
@@ -295,8 +346,13 @@ const Dashboard = ({ user }) => {
                         sx={{
                             mb: 4,
                             borderRadius: "12px",
+                            backgroundColor: darkMode ? "#991b1b" : undefined,
+                            color: darkMode ? "#fecaca" : undefined,
                             "& .MuiAlert-message": {
                                 fontSize: "1rem",
+                            },
+                            "& .MuiAlert-icon": {
+                                color: darkMode ? "#fecaca" : undefined,
                             },
                         }}
                         onClose={() => setError("")}
@@ -305,12 +361,12 @@ const Dashboard = ({ user }) => {
                     </Alert>
                 )}
 
-                {/* COMPLETELY REDESIGNED Filter Section */}
+                {/* DARK MODE ENHANCED Filter Section */}
                 <Card
                     elevation={0}
                     sx={{
-                        backgroundColor: "#f8fafc",
-                        border: "2px solid #e2e8f0",
+                        backgroundColor: darkMode ? "#334155" : "#f8fafc",
+                        border: `2px solid ${darkMode ? "#475569" : "#e2e8f0"}`,
                         borderRadius: "16px",
                         overflow: "visible",
                     }}
@@ -342,7 +398,10 @@ const Dashboard = ({ user }) => {
                             </Box>
                             <Typography
                                 variant="h6"
-                                sx={{ fontWeight: 600, color: "#1f2937" }}
+                                sx={{
+                                    fontWeight: 600,
+                                    color: darkMode ? "#f1f5f9" : "#1f2937",
+                                }}
                             >
                                 Filter & Search
                             </Typography>
@@ -357,8 +416,10 @@ const Dashboard = ({ user }) => {
                                     } active`}
                                     size="small"
                                     sx={{
-                                        backgroundColor: "#fef3c7",
-                                        color: "#92400e",
+                                        backgroundColor: darkMode
+                                            ? "#fbbf24"
+                                            : "#fef3c7",
+                                        color: darkMode ? "#1f2937" : "#92400e",
                                         fontWeight: 600,
                                     }}
                                 />
@@ -372,7 +433,9 @@ const Dashboard = ({ user }) => {
                                     <Typography
                                         variant="subtitle2"
                                         sx={{
-                                            color: "#374151",
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#374151",
                                             fontWeight: 600,
                                             mb: 1,
                                             display: "flex",
@@ -395,27 +458,47 @@ const Dashboard = ({ user }) => {
                                         startAdornment: (
                                             <InputAdornment position="start">
                                                 <Search
-                                                    sx={{ color: "#9ca3af" }}
+                                                    sx={{
+                                                        color: darkMode
+                                                            ? "#94a3b8"
+                                                            : "#9ca3af",
+                                                    }}
                                                 />
                                             </InputAdornment>
                                         ),
                                     }}
                                     sx={{
                                         "& .MuiOutlinedInput-root": {
-                                            backgroundColor: "#ffffff",
+                                            backgroundColor: darkMode
+                                                ? "#1e293b"
+                                                : "#ffffff",
                                             borderRadius: "12px",
                                             height: "56px",
                                             fontSize: "1rem",
                                             "& fieldset": {
-                                                borderColor: "#d1d5db",
+                                                borderColor: darkMode
+                                                    ? "#475569"
+                                                    : "#d1d5db",
                                                 borderWidth: "2px",
                                             },
                                             "&:hover fieldset": {
-                                                borderColor: "#9ca3af",
+                                                borderColor: darkMode
+                                                    ? "#667eea"
+                                                    : "#9ca3af",
                                             },
                                             "&.Mui-focused fieldset": {
                                                 borderColor: "#3b82f6",
                                                 borderWidth: "2px",
+                                            },
+                                        },
+                                        "& .MuiOutlinedInput-input": {
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937",
+                                            "&::placeholder": {
+                                                color: darkMode
+                                                    ? "#94a3b8"
+                                                    : "#9ca3af",
                                             },
                                         },
                                     }}
@@ -428,7 +511,9 @@ const Dashboard = ({ user }) => {
                                     <Typography
                                         variant="subtitle2"
                                         sx={{
-                                            color: "#374151",
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#374151",
                                             fontWeight: 600,
                                             mb: 1,
                                             display: "flex",
@@ -448,17 +533,23 @@ const Dashboard = ({ user }) => {
                                     }
                                     displayEmpty
                                     sx={{
-                                        backgroundColor: "#ffffff",
+                                        backgroundColor: darkMode
+                                            ? "#1e293b"
+                                            : "#ffffff",
                                         borderRadius: "12px",
                                         height: "56px",
                                         fontSize: "1rem",
                                         "& .MuiOutlinedInput-notchedOutline": {
-                                            borderColor: "#d1d5db",
+                                            borderColor: darkMode
+                                                ? "#475569"
+                                                : "#d1d5db",
                                             borderWidth: "2px",
                                         },
                                         "&:hover .MuiOutlinedInput-notchedOutline":
                                             {
-                                                borderColor: "#9ca3af",
+                                                borderColor: darkMode
+                                                    ? "#667eea"
+                                                    : "#9ca3af",
                                             },
                                         "&.Mui-focused .MuiOutlinedInput-notchedOutline":
                                             {
@@ -470,7 +561,16 @@ const Dashboard = ({ user }) => {
                                             alignItems: "center",
                                             gap: 1,
                                             color: languageFilter
-                                                ? "#1f2937"
+                                                ? darkMode
+                                                    ? "#f1f5f9"
+                                                    : "#1f2937"
+                                                : darkMode
+                                                ? "#94a3b8"
+                                                : "#9ca3af",
+                                        },
+                                        "& .MuiSvgIcon-root": {
+                                            color: darkMode
+                                                ? "#94a3b8"
                                                 : "#9ca3af",
                                         },
                                     }}
@@ -479,20 +579,38 @@ const Dashboard = ({ user }) => {
                                             sx: {
                                                 borderRadius: "12px",
                                                 mt: 1,
+                                                backgroundColor: darkMode
+                                                    ? "#1e293b"
+                                                    : "#ffffff",
                                                 boxShadow:
                                                     "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-                                                border: "1px solid #e5e7eb",
+                                                border: `1px solid ${
+                                                    darkMode
+                                                        ? "#475569"
+                                                        : "#e5e7eb"
+                                                }`,
                                             },
                                         },
                                     }}
                                 >
-                                    <MenuItem value="">
+                                    <MenuItem
+                                        value=""
+                                        sx={{
+                                            color: darkMode
+                                                ? "#94a3b8"
+                                                : "#9ca3af",
+                                            "&:hover": {
+                                                backgroundColor: darkMode
+                                                    ? "#374151"
+                                                    : "#f3f4f6",
+                                            },
+                                        }}
+                                    >
                                         <Box
                                             sx={{
                                                 display: "flex",
                                                 alignItems: "center",
                                                 gap: 1,
-                                                color: "#9ca3af",
                                             }}
                                         >
                                             <Code fontSize="small" />
@@ -500,7 +618,20 @@ const Dashboard = ({ user }) => {
                                         </Box>
                                     </MenuItem>
                                     {languages.sort().map((lang) => (
-                                        <MenuItem key={lang} value={lang}>
+                                        <MenuItem
+                                            key={lang}
+                                            value={lang}
+                                            sx={{
+                                                color: darkMode
+                                                    ? "#f1f5f9"
+                                                    : "#1f2937",
+                                                "&:hover": {
+                                                    backgroundColor: darkMode
+                                                        ? "#374151"
+                                                        : "#f3f4f6",
+                                                },
+                                            }}
+                                        >
                                             <Box
                                                 sx={{
                                                     display: "flex",
@@ -510,7 +641,11 @@ const Dashboard = ({ user }) => {
                                             >
                                                 <Code
                                                     fontSize="small"
-                                                    sx={{ color: "#6b7280" }}
+                                                    sx={{
+                                                        color: darkMode
+                                                            ? "#94a3b8"
+                                                            : "#6b7280",
+                                                    }}
                                                 />
                                                 {lang.toUpperCase()}
                                             </Box>
@@ -525,7 +660,9 @@ const Dashboard = ({ user }) => {
                                     <Typography
                                         variant="subtitle2"
                                         sx={{
-                                            color: "#374151",
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#374151",
                                             fontWeight: 600,
                                             mb: 1,
                                             display: "flex",
@@ -545,17 +682,23 @@ const Dashboard = ({ user }) => {
                                     }
                                     displayEmpty
                                     sx={{
-                                        backgroundColor: "#ffffff",
+                                        backgroundColor: darkMode
+                                            ? "#1e293b"
+                                            : "#ffffff",
                                         borderRadius: "12px",
                                         height: "56px",
                                         fontSize: "1rem",
                                         "& .MuiOutlinedInput-notchedOutline": {
-                                            borderColor: "#d1d5db",
+                                            borderColor: darkMode
+                                                ? "#475569"
+                                                : "#d1d5db",
                                             borderWidth: "2px",
                                         },
                                         "&:hover .MuiOutlinedInput-notchedOutline":
                                             {
-                                                borderColor: "#9ca3af",
+                                                borderColor: darkMode
+                                                    ? "#667eea"
+                                                    : "#9ca3af",
                                             },
                                         "&.Mui-focused .MuiOutlinedInput-notchedOutline":
                                             {
@@ -567,7 +710,16 @@ const Dashboard = ({ user }) => {
                                             alignItems: "center",
                                             gap: 1,
                                             color: publicFilter
-                                                ? "#1f2937"
+                                                ? darkMode
+                                                    ? "#f1f5f9"
+                                                    : "#1f2937"
+                                                : darkMode
+                                                ? "#94a3b8"
+                                                : "#9ca3af",
+                                        },
+                                        "& .MuiSvgIcon-root": {
+                                            color: darkMode
+                                                ? "#94a3b8"
                                                 : "#9ca3af",
                                         },
                                     }}
@@ -576,27 +728,57 @@ const Dashboard = ({ user }) => {
                                             sx: {
                                                 borderRadius: "12px",
                                                 mt: 1,
+                                                backgroundColor: darkMode
+                                                    ? "#1e293b"
+                                                    : "#ffffff",
                                                 boxShadow:
                                                     "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-                                                border: "1px solid #e5e7eb",
+                                                border: `1px solid ${
+                                                    darkMode
+                                                        ? "#475569"
+                                                        : "#e5e7eb"
+                                                }`,
                                             },
                                         },
                                     }}
                                 >
-                                    <MenuItem value="">
+                                    <MenuItem
+                                        value=""
+                                        sx={{
+                                            color: darkMode
+                                                ? "#94a3b8"
+                                                : "#9ca3af",
+                                            "&:hover": {
+                                                backgroundColor: darkMode
+                                                    ? "#374151"
+                                                    : "#f3f4f6",
+                                            },
+                                        }}
+                                    >
                                         <Box
                                             sx={{
                                                 display: "flex",
                                                 alignItems: "center",
                                                 gap: 1,
-                                                color: "#9ca3af",
                                             }}
                                         >
                                             <Public fontSize="small" />
                                             All Snippets
                                         </Box>
                                     </MenuItem>
-                                    <MenuItem value="true">
+                                    <MenuItem
+                                        value="true"
+                                        sx={{
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937",
+                                            "&:hover": {
+                                                backgroundColor: darkMode
+                                                    ? "#374151"
+                                                    : "#f3f4f6",
+                                            },
+                                        }}
+                                    >
                                         <Box
                                             sx={{
                                                 display: "flex",
@@ -611,7 +793,19 @@ const Dashboard = ({ user }) => {
                                             Public Only
                                         </Box>
                                     </MenuItem>
-                                    <MenuItem value="false">
+                                    <MenuItem
+                                        value="false"
+                                        sx={{
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937",
+                                            "&:hover": {
+                                                backgroundColor: darkMode
+                                                    ? "#374151"
+                                                    : "#f3f4f6",
+                                            },
+                                        }}
+                                    >
                                         <Box
                                             sx={{
                                                 display: "flex",
@@ -636,7 +830,9 @@ const Dashboard = ({ user }) => {
                                 sx={{
                                     mt: 3,
                                     pt: 3,
-                                    borderTop: "1px solid #e5e7eb",
+                                    borderTop: `1px solid ${
+                                        darkMode ? "#475569" : "#e5e7eb"
+                                    }`,
                                 }}
                             >
                                 <Box
@@ -659,7 +855,9 @@ const Dashboard = ({ user }) => {
                                         <Typography
                                             variant="body2"
                                             sx={{
-                                                color: "#6b7280",
+                                                color: darkMode
+                                                    ? "#94a3b8"
+                                                    : "#6b7280",
                                                 fontWeight: 600,
                                                 mr: 1,
                                             }}
@@ -739,8 +937,12 @@ const Dashboard = ({ user }) => {
                                         startIcon={<Clear />}
                                         sx={{
                                             borderRadius: "12px",
-                                            borderColor: "#e5e7eb",
-                                            color: "#6b7280",
+                                            borderColor: darkMode
+                                                ? "#475569"
+                                                : "#e5e7eb",
+                                            color: darkMode
+                                                ? "#94a3b8"
+                                                : "#6b7280",
                                             fontWeight: 600,
                                             px: 3,
                                             "&:hover": {
@@ -778,10 +980,12 @@ const Dashboard = ({ user }) => {
                 elevation={0}
                 sx={{
                     p: 4,
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e5e7eb",
+                    backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    border: `1px solid ${darkMode ? "#374151" : "#e5e7eb"}`,
                     borderRadius: "20px",
-                    boxShadow: "0 8px 30px rgba(0,0,0,0.08)",
+                    boxShadow: darkMode
+                        ? "0 8px 30px rgba(0,0,0,0.3)"
+                        : "0 8px 30px rgba(0,0,0,0.08)",
                 }}
             >
                 {loading ? (
@@ -795,10 +999,13 @@ const Dashboard = ({ user }) => {
                             gap: 3,
                         }}
                     >
-                        <CircularProgress size={50} sx={{ color: "#3b82f6" }} />
+                        <CircularProgress size={50} sx={{ color: "#667eea" }} />
                         <Typography
                             variant="h6"
-                            sx={{ color: "#6b7280", fontWeight: 500 }}
+                            sx={{
+                                color: darkMode ? "#94a3b8" : "#6b7280",
+                                fontWeight: 500,
+                            }}
                         >
                             Loading your amazing snippets...
                         </Typography>
@@ -809,11 +1016,19 @@ const Dashboard = ({ user }) => {
                         sx={{ textAlign: "center", py: 12 }}
                     >
                         <FilterList
-                            sx={{ fontSize: 80, color: "#d1d5db", mb: 3 }}
+                            sx={{
+                                fontSize: 80,
+                                color: darkMode ? "#475569" : "#d1d5db",
+                                mb: 3,
+                            }}
                         />
                         <Typography
                             variant="h4"
-                            sx={{ mb: 2, color: "#374151", fontWeight: 700 }}
+                            sx={{
+                                mb: 2,
+                                color: darkMode ? "#f1f5f9" : "#374151",
+                                fontWeight: 700,
+                            }}
                         >
                             {hasActiveFilters
                                 ? "No matching snippets found"
@@ -822,7 +1037,7 @@ const Dashboard = ({ user }) => {
                         <Typography
                             variant="h6"
                             sx={{
-                                color: "#6b7280",
+                                color: darkMode ? "#94a3b8" : "#6b7280",
                                 mb: 4,
                                 maxWidth: "500px",
                                 mx: "auto",
@@ -900,8 +1115,10 @@ const Dashboard = ({ user }) => {
                         sx={{
                             p: 2,
                             borderRadius: "16px",
-                            border: "1px solid #e5e7eb",
-                            backgroundColor: "#ffffff",
+                            border: `1px solid ${
+                                darkMode ? "#374151" : "#e5e7eb"
+                            }`,
+                            backgroundColor: darkMode ? "#1e293b" : "#ffffff",
                         }}
                     >
                         <Box
@@ -921,6 +1138,16 @@ const Dashboard = ({ user }) => {
                                     borderRadius: "12px",
                                     px: 3,
                                     fontWeight: 600,
+                                    borderColor: darkMode
+                                        ? "#475569"
+                                        : "#d1d5db",
+                                    color: darkMode ? "#f1f5f9" : "#374151",
+                                    "&:hover": {
+                                        borderColor: "#667eea",
+                                        backgroundColor: darkMode
+                                            ? "rgba(102, 126, 234, 0.1)"
+                                            : "rgba(102, 126, 234, 0.05)",
+                                    },
                                 }}
                             >
                                 Previous
@@ -930,10 +1157,12 @@ const Dashboard = ({ user }) => {
                                 sx={{
                                     px: 4,
                                     py: 1,
-                                    color: "#6b7280",
+                                    color: darkMode ? "#94a3b8" : "#6b7280",
                                     fontSize: "1rem",
                                     fontWeight: 600,
-                                    backgroundColor: "#f8fafc",
+                                    backgroundColor: darkMode
+                                        ? "#334155"
+                                        : "#f8fafc",
                                     borderRadius: "8px",
                                 }}
                             >
@@ -950,6 +1179,16 @@ const Dashboard = ({ user }) => {
                                     borderRadius: "12px",
                                     px: 3,
                                     fontWeight: 600,
+                                    borderColor: darkMode
+                                        ? "#475569"
+                                        : "#d1d5db",
+                                    color: darkMode ? "#f1f5f9" : "#374151",
+                                    "&:hover": {
+                                        borderColor: "#667eea",
+                                        backgroundColor: darkMode
+                                            ? "rgba(102, 126, 234, 0.1)"
+                                            : "rgba(102, 126, 234, 0.05)",
+                                    },
                                 }}
                             >
                                 Next

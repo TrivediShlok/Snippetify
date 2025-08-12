@@ -11,21 +11,26 @@ import {
     Avatar,
     Divider,
     Fade,
+    Button,
 } from "@mui/material";
 import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     Favorite as FavoriteIcon,
     FavoriteBorder as FavoriteBorderIcon,
-    ContentCopy as CopyIcon,
     Visibility as ViewIcon,
+    Public as PublicIcon,
+    Lock as LockIcon,
+    ContentCopy as CopyIcon,
     Code as CodeIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../contexts/ThemeContext";
 import toast from "react-hot-toast";
 
 const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
     const navigate = useNavigate();
+    const { darkMode } = useTheme();
     const [isHovered, setIsHovered] = useState(false);
 
     const isOwner =
@@ -38,36 +43,64 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
             (like) => like.user === user?.id || like.user?._id === user?.id
         );
 
-    const handleCopyCode = async () => {
-        try {
-            await navigator.clipboard.writeText(snippet.code);
-            toast.success("Code copied to clipboard!");
-        } catch (error) {
-            toast.error("Failed to copy code");
-        }
-    };
-
     const getLanguageColor = (language) => {
         const colors = {
             javascript: "#f7df1e",
+            typescript: "#3178c6",
             python: "#3776ab",
             java: "#ed8b00",
-            react: "#61dafb",
-            html: "#e34f26",
-            css: "#1572b6",
-            typescript: "#3178c6",
+            c: "#00599c",
+            cpp: "#00599c",
+            csharp: "#239120",
             php: "#777bb4",
             ruby: "#cc342d",
             go: "#00add8",
             rust: "#000000",
+            html: "#e34f26",
+            css: "#1572b6",
+            scss: "#cf649a",
+            sql: "#336791",
             other: "#6b7280",
         };
         return colors[language?.toLowerCase()] || colors.other;
     };
 
     const truncateCode = (code, maxLength = 150) => {
+        if (!code) return "No code available";
         if (code.length <= maxLength) return code;
         return code.substring(0, maxLength) + "...";
+    };
+
+    const handleCopyCode = async (e) => {
+        e.stopPropagation();
+        try {
+            await navigator.clipboard.writeText(snippet.code || "");
+            toast.success("Code copied to clipboard!", {
+                style: {
+                    background: darkMode ? "#374151" : "#ffffff",
+                    color: darkMode ? "#f3f4f6" : "#1f2937",
+                },
+            });
+        } catch (error) {
+            toast.error("Failed to copy code", {
+                style: {
+                    background: darkMode ? "#374151" : "#ffffff",
+                    color: darkMode ? "#f3f4f6" : "#1f2937",
+                },
+            });
+        }
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) return "Today";
+        if (diffDays === 2) return "Yesterday";
+        if (diffDays <= 7) return `${diffDays - 1} days ago`;
+        return date.toLocaleDateString();
     };
 
     return (
@@ -76,21 +109,31 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 sx={{
-                    borderRadius: "16px",
-                    boxShadow: isHovered
-                        ? "0 20px 40px rgba(0,0,0,0.12)"
-                        : "0 4px 20px rgba(0,0,0,0.08)",
-                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                    transform: isHovered ? "translateY(-8px)" : "translateY(0)",
-                    border: "1px solid",
-                    borderColor: isHovered ? "#e3f2fd" : "#f5f5f5",
-                    background:
-                        "linear-gradient(135deg, #ffffff 0%, #fafafa 100%)",
-                    position: "relative",
-                    overflow: "hidden",
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
+                    borderRadius: "20px",
+                    border: `1px solid ${
+                        isHovered
+                            ? darkMode
+                                ? "#667eea"
+                                : "#3b82f6"
+                            : darkMode
+                            ? "#374151"
+                            : "#e5e7eb"
+                    }`,
+                    backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    boxShadow: isHovered
+                        ? darkMode
+                            ? "0 25px 50px -12px rgba(0,0,0,0.5)"
+                            : "0 25px 50px -12px rgba(0,0,0,0.15)"
+                        : darkMode
+                        ? "0 10px 15px -3px rgba(0,0,0,0.3)"
+                        : "0 10px 15px -3px rgba(0,0,0,0.1)",
+                    transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                    transform: isHovered ? "translateY(-8px)" : "translateY(0)",
+                    overflow: "hidden",
+                    position: "relative",
                     "&::before": {
                         content: '""',
                         position: "absolute",
@@ -99,53 +142,49 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                         right: 0,
                         height: "4px",
                         background: `linear-gradient(90deg, ${getLanguageColor(
-                            snippet.programmingLanguage
+                            snippet.programmingLanguage || snippet.language
                         )}, ${getLanguageColor(
-                            snippet.programmingLanguage
-                        )}80)`,
+                            snippet.programmingLanguage || snippet.language
+                        )}cc)`,
                     },
                 }}
             >
-                <CardContent
-                    sx={{
-                        flexGrow: 1,
-                        p: 3,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 2,
-                    }}
-                >
-                    {/* Header Section */}
+                {/* Header Section */}
+                <Box sx={{ p: 3, pb: 0 }}>
                     <Box
                         sx={{
                             display: "flex",
                             alignItems: "flex-start",
                             gap: 2,
+                            mb: 2,
                         }}
                     >
                         <Avatar
                             sx={{
-                                width: 40,
-                                height: 40,
-                                bgcolor: getLanguageColor(
-                                    snippet.programmingLanguage
+                                width: 48,
+                                height: 48,
+                                backgroundColor: getLanguageColor(
+                                    snippet.programmingLanguage ||
+                                        snippet.language
                                 ),
-                                fontSize: "0.875rem",
+                                fontSize: "1rem",
                                 fontWeight: "bold",
-                                color: "#fff",
+                                color: "#ffffff",
+                                flexShrink: 0,
+                                border: "3px solid rgba(255,255,255,0.2)",
                             }}
                         >
-                            <CodeIcon fontSize="small" />
+                            <CodeIcon />
                         </Avatar>
-                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
                             <Typography
                                 variant="h6"
                                 sx={{
                                     fontWeight: 700,
-                                    fontSize: "1.1rem",
-                                    color: "#1a1a1a",
+                                    fontSize: "1.25rem",
+                                    color: darkMode ? "#f1f5f9" : "#1f2937",
                                     cursor: "pointer",
-                                    mb: 0.5,
+                                    mb: 1,
                                     lineHeight: 1.3,
                                     overflow: "hidden",
                                     textOverflow: "ellipsis",
@@ -153,79 +192,170 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                                     WebkitLineClamp: 2,
                                     WebkitBoxOrient: "vertical",
                                     "&:hover": {
-                                        color: "#2563eb",
+                                        color: "#667eea",
                                     },
                                 }}
                                 onClick={() =>
                                     navigate(`/snippet/${snippet._id}`)
                                 }
                             >
-                                {snippet.title}
+                                {snippet.title || "Untitled Snippet"}
                             </Typography>
-                            <Typography
-                                variant="body2"
+
+                            <Box
                                 sx={{
-                                    color: "#666",
-                                    fontSize: "0.875rem",
-                                    lineHeight: 1.4,
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    display: "-webkit-box",
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: "vertical",
-                                    minHeight: "35px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                    mb: 1,
                                 }}
                             >
-                                {snippet.description ||
-                                    "No description provided"}
-                            </Typography>
+                                <Chip
+                                    label={(
+                                        snippet.programmingLanguage ||
+                                        snippet.language ||
+                                        "text"
+                                    ).toUpperCase()}
+                                    size="small"
+                                    sx={{
+                                        backgroundColor: `${getLanguageColor(
+                                            snippet.programmingLanguage ||
+                                                snippet.language
+                                        )}20`,
+                                        color: getLanguageColor(
+                                            snippet.programmingLanguage ||
+                                                snippet.language
+                                        ),
+                                        fontWeight: 700,
+                                        fontSize: "0.75rem",
+                                        height: "24px",
+                                        border: `1px solid ${getLanguageColor(
+                                            snippet.programmingLanguage ||
+                                                snippet.language
+                                        )}40`,
+                                    }}
+                                />
+                                <Tooltip
+                                    title={
+                                        snippet.isPublic
+                                            ? "Public snippet"
+                                            : "Private snippet"
+                                    }
+                                >
+                                    {snippet.isPublic ? (
+                                        <PublicIcon
+                                            sx={{
+                                                fontSize: "18px",
+                                                color: "#10b981",
+                                            }}
+                                        />
+                                    ) : (
+                                        <LockIcon
+                                            sx={{
+                                                fontSize: "18px",
+                                                color: "#f59e0b",
+                                            }}
+                                        />
+                                    )}
+                                </Tooltip>
+                            </Box>
+
+                            {snippet.description && (
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: darkMode ? "#94a3b8" : "#6b7280",
+                                        fontSize: "0.875rem",
+                                        lineHeight: 1.5,
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        display: "-webkit-box",
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: "vertical",
+                                    }}
+                                >
+                                    {snippet.description}
+                                </Typography>
+                            )}
                         </Box>
                     </Box>
+                </Box>
 
-                    {/* Code Preview Section */}
+                {/* Code Preview Section */}
+                <CardContent sx={{ flexGrow: 1, p: 3, pt: 0 }}>
                     <Box
                         sx={{
-                            backgroundColor: "#1e1e1e",
+                            backgroundColor: darkMode ? "#0f172a" : "#f8fafc",
                             borderRadius: "12px",
-                            p: 2,
+                            border: `1px solid ${
+                                darkMode ? "#374151" : "#e5e7eb"
+                            }`,
                             position: "relative",
                             overflow: "hidden",
-                            border: "1px solid #333",
+                            mb: 2,
                         }}
                     >
+                        {/* Code Header */}
                         <Box
                             sx={{
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "space-between",
-                                mb: 1,
+                                p: 2,
+                                backgroundColor: darkMode
+                                    ? "#1e293b"
+                                    : "#ffffff",
+                                borderBottom: `1px solid ${
+                                    darkMode ? "#374151" : "#e5e7eb"
+                                }`,
                             }}
                         >
-                            <Chip
-                                label={
-                                    snippet.programmingLanguage?.toUpperCase() ||
-                                    "CODE"
-                                }
-                                size="small"
+                            <Box
                                 sx={{
-                                    bgcolor: getLanguageColor(
-                                        snippet.programmingLanguage
-                                    ),
-                                    color: "#fff",
-                                    fontWeight: 600,
-                                    fontSize: "0.75rem",
-                                    height: "20px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
                                 }}
-                            />
+                            >
+                                <Box
+                                    sx={{
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: "50%",
+                                        backgroundColor: "#ef4444",
+                                    }}
+                                />
+                                <Box
+                                    sx={{
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: "50%",
+                                        backgroundColor: "#f59e0b",
+                                    }}
+                                />
+                                <Box
+                                    sx={{
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: "50%",
+                                        backgroundColor: "#10b981",
+                                    }}
+                                />
+                            </Box>
+
                             <Tooltip title="Copy code">
                                 <IconButton
                                     size="small"
                                     onClick={handleCopyCode}
                                     sx={{
-                                        color: "#9ca3af",
+                                        color: darkMode ? "#94a3b8" : "#6b7280",
                                         "&:hover": {
-                                            color: "#fff",
-                                            bgcolor: "rgba(255,255,255,0.1)",
+                                            color: darkMode
+                                                ? "#f3f4f6"
+                                                : "#374151",
+                                            backgroundColor: darkMode
+                                                ? "#374151"
+                                                : "#f3f4f6",
                                         },
                                     }}
                                 >
@@ -233,29 +363,57 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                                 </IconButton>
                             </Tooltip>
                         </Box>
-                        <Typography
-                            component="pre"
+
+                        {/* Code Content */}
+                        <Box
                             sx={{
-                                fontFamily:
-                                    '"Fira Code", "Consolas", "Monaco", monospace',
-                                fontSize: "0.8rem",
-                                color: "#e5e7eb",
-                                margin: 0,
-                                whiteSpace: "pre-wrap",
-                                wordBreak: "break-word",
-                                lineHeight: 1.5,
+                                p: 2,
                                 maxHeight: "120px",
                                 overflow: "hidden",
                             }}
                         >
-                            {truncateCode(snippet.code)}
-                        </Typography>
+                            <Typography
+                                component="pre"
+                                sx={{
+                                    fontFamily:
+                                        '"Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace',
+                                    fontSize: "0.8rem",
+                                    color: darkMode ? "#e2e8f0" : "#1e293b",
+                                    margin: 0,
+                                    whiteSpace: "pre-wrap",
+                                    wordBreak: "break-word",
+                                    lineHeight: 1.6,
+                                    overflow: "hidden",
+                                }}
+                            >
+                                {truncateCode(snippet.code)}
+                            </Typography>
+                        </Box>
+
+                        {/* Fade overlay for truncated code */}
+                        <Box
+                            sx={{
+                                position: "absolute",
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                height: "20px",
+                                background: darkMode
+                                    ? "linear-gradient(transparent, #0f172a)"
+                                    : "linear-gradient(transparent, #f8fafc)",
+                            }}
+                        />
                     </Box>
 
                     {/* Tags Section */}
                     {snippet.tags && snippet.tags.length > 0 && (
                         <Box
-                            sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
+                            sx={{
+                                display: "flex",
+                                flexWrap: "wrap",
+                                gap: 0.75,
+                                mb: 2,
+                            }}
                         >
                             {snippet.tags.slice(0, 4).map((tag, index) => (
                                 <Chip
@@ -266,11 +424,16 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                                     sx={{
                                         fontSize: "0.7rem",
                                         height: "24px",
-                                        borderColor: "#e0e0e0",
-                                        color: "#666",
+                                        borderColor: darkMode
+                                            ? "#475569"
+                                            : "#d1d5db",
+                                        color: darkMode ? "#94a3b8" : "#6b7280",
                                         "&:hover": {
-                                            borderColor: "#2563eb",
-                                            color: "#2563eb",
+                                            borderColor: "#667eea",
+                                            color: "#667eea",
+                                            backgroundColor: darkMode
+                                                ? "rgba(102, 126, 234, 0.1)"
+                                                : "rgba(102, 126, 234, 0.05)",
                                         },
                                     }}
                                 />
@@ -283,8 +446,10 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                                     sx={{
                                         fontSize: "0.7rem",
                                         height: "24px",
-                                        borderColor: "#e0e0e0",
-                                        color: "#999",
+                                        borderColor: darkMode
+                                            ? "#475569"
+                                            : "#d1d5db",
+                                        color: darkMode ? "#64748b" : "#9ca3af",
                                     }}
                                 />
                             )}
@@ -302,7 +467,11 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                     >
                         <Typography
                             variant="caption"
-                            sx={{ color: "#888", fontSize: "0.75rem" }}
+                            sx={{
+                                color: darkMode ? "#64748b" : "#6b7280",
+                                fontSize: "0.75rem",
+                                fontWeight: 500,
+                            }}
                         >
                             by{" "}
                             {snippet.author?.username ||
@@ -311,26 +480,32 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                         </Typography>
                         <Typography
                             variant="caption"
-                            sx={{ color: "#888", fontSize: "0.75rem" }}
+                            sx={{
+                                color: darkMode ? "#64748b" : "#6b7280",
+                                fontSize: "0.75rem",
+                                fontWeight: 500,
+                            }}
                         >
-                            {new Date(snippet.createdAt).toLocaleDateString()}
+                            {formatDate(snippet.createdAt)}
                         </Typography>
                     </Box>
                 </CardContent>
 
-                <Divider sx={{ borderColor: "#f0f0f0" }} />
+                <Divider
+                    sx={{ borderColor: darkMode ? "#374151" : "#f0f0f0" }}
+                />
 
                 {/* Actions Section */}
                 <CardActions
                     sx={{
                         px: 3,
-                        py: 1.5,
+                        py: 2,
                         justifyContent: "space-between",
-                        backgroundColor: "#fafafa",
+                        backgroundColor: darkMode ? "#334155" : "#f8fafc",
                     }}
                 >
                     <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+                        sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
                     >
                         <Tooltip title={isLiked ? "Unlike" : "Like"}>
                             <IconButton
@@ -339,12 +514,18 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                                     onToggleLike && onToggleLike(snippet._id)
                                 }
                                 sx={{
-                                    color: isLiked ? "#ef4444" : "#9ca3af",
+                                    color: isLiked
+                                        ? "#ef4444"
+                                        : darkMode
+                                        ? "#94a3b8"
+                                        : "#6b7280",
                                     "&:hover": {
                                         color: "#ef4444",
                                         backgroundColor:
                                             "rgba(239, 68, 68, 0.1)",
+                                        transform: "scale(1.1)",
                                     },
+                                    transition: "all 0.2s ease",
                                 }}
                             >
                                 {isLiked ? (
@@ -356,7 +537,11 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                         </Tooltip>
                         <Typography
                             variant="body2"
-                            sx={{ color: "#666", fontSize: "0.8rem" }}
+                            sx={{
+                                color: darkMode ? "#94a3b8" : "#6b7280",
+                                fontSize: "0.8rem",
+                                fontWeight: 600,
+                            }}
                         >
                             {snippet.likes?.length || 0}
                         </Typography>
@@ -371,11 +556,15 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                         >
                             <ViewIcon
                                 fontSize="small"
-                                sx={{ color: "#9ca3af" }}
+                                sx={{ color: darkMode ? "#94a3b8" : "#6b7280" }}
                             />
                             <Typography
                                 variant="body2"
-                                sx={{ color: "#666", fontSize: "0.8rem" }}
+                                sx={{
+                                    color: darkMode ? "#94a3b8" : "#6b7280",
+                                    fontSize: "0.8rem",
+                                    fontWeight: 600,
+                                }}
                             >
                                 {snippet.views || 0}
                             </Typography>
@@ -383,22 +572,27 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                     </Box>
 
                     <Box sx={{ display: "flex", gap: 0.5 }}>
-                        <Tooltip title="View full snippet">
-                            <IconButton
+                        <Tooltip title="View details">
+                            <Button
                                 size="small"
                                 onClick={() =>
                                     navigate(`/snippet/${snippet._id}`)
                                 }
+                                startIcon={<ViewIcon />}
                                 sx={{
-                                    color: "#2563eb",
+                                    color: "#667eea",
+                                    minWidth: "auto",
+                                    px: 1.5,
                                     "&:hover": {
                                         backgroundColor:
-                                            "rgba(37, 99, 235, 0.1)",
+                                            "rgba(102, 126, 234, 0.1)",
+                                        transform: "translateY(-1px)",
                                     },
+                                    transition: "all 0.2s ease",
                                 }}
                             >
-                                <ViewIcon fontSize="small" />
-                            </IconButton>
+                                View
+                            </Button>
                         </Tooltip>
 
                         {isOwner && (
@@ -414,7 +608,9 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                                             "&:hover": {
                                                 backgroundColor:
                                                     "rgba(16, 185, 129, 0.1)",
+                                                transform: "scale(1.1)",
                                             },
+                                            transition: "all 0.2s ease",
                                         }}
                                     >
                                         <EditIcon fontSize="small" />
@@ -432,7 +628,9 @@ const SnippetCard = ({ snippet, onEdit, onDelete, onToggleLike, user }) => {
                                             "&:hover": {
                                                 backgroundColor:
                                                     "rgba(239, 68, 68, 0.1)",
+                                                transform: "scale(1.1)",
                                             },
+                                            transition: "all 0.2s ease",
                                         }}
                                     >
                                         <DeleteIcon fontSize="small" />

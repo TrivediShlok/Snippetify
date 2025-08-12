@@ -6,205 +6,227 @@ import {
     Button,
     Box,
     IconButton,
+    Avatar,
     Menu,
     MenuItem,
-    Avatar,
-    Container,
-    Chip,
+    Divider,
+    Switch,
+    FormControlLabel,
 } from "@mui/material";
-import { Code, Person, Dashboard as DashboardIcon } from "@mui/icons-material";
+import {
+    Code as CodeIcon,
+    Person as PersonIcon,
+    Logout as LogoutIcon,
+    Dashboard as DashboardIcon,
+    Brightness4 as DarkModeIcon,
+    Brightness7 as LightModeIcon,
+} from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../../services/authService";
+import { useTheme } from "../../contexts/ThemeContext";
 import LoginForm from "../auth/LoginForm";
 import SignupForm from "../auth/SignupForm";
+import { authService } from "../../services/authService";
+import toast from "react-hot-toast";
 
 const Header = ({ user, setUser }) => {
     const navigate = useNavigate();
-    const [anchorEl, setAnchorEl] = useState(null);
+    const { darkMode, toggleDarkMode } = useTheme();
     const [showLogin, setShowLogin] = useState(false);
     const [showSignup, setShowSignup] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
 
-    const handleMenu = (event) => {
+    const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleClose = () => {
+    const handleProfileMenuClose = () => {
         setAnchorEl(null);
     };
 
     const handleLogout = () => {
         authService.logout();
         setUser(null);
-        handleClose();
+        handleProfileMenuClose();
+        navigate("/");
+        toast.success("Logged out successfully", {
+            style: {
+                background: darkMode ? "#374151" : "#ffffff",
+                color: darkMode ? "#f3f4f6" : "#1f2937",
+            },
+        });
     };
 
-    const handleDashboard = () => {
-        navigate("/dashboard");
-        handleClose();
+    const handleAuthSuccess = (data) => {
+        setUser(data.user);
+        setShowLogin(false);
+        setShowSignup(false);
+        toast.success("Welcome to Snippetify!", {
+            style: {
+                background: darkMode ? "#374151" : "#ffffff",
+                color: darkMode ? "#f3f4f6" : "#1f2937",
+            },
+        });
+    };
+
+    const switchToSignup = () => {
+        setShowLogin(false);
+        setShowSignup(true);
+    };
+
+    const switchToLogin = () => {
+        setShowSignup(false);
+        setShowLogin(true);
     };
 
     return (
         <>
             <AppBar
-                position="static"
+                position="sticky"
                 elevation={0}
                 sx={{
-                    backgroundColor: "rgba(255, 255, 255, 0.95)",
-                    backdropFilter: "blur(20px)",
-                    color: "#1f2937",
-                    borderBottom: "1px solid rgba(229, 231, 235, 0.5)",
+                    backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    borderBottom: `1px solid ${
+                        darkMode ? "#475569" : "#e5e7eb"
+                    }`,
+                    backdropFilter: "blur(8px)",
                 }}
             >
-                <Container maxWidth="xl">
-                    <Toolbar sx={{ justifyContent: "space-between", py: 1 }}>
+                <Toolbar sx={{ justifyContent: "space-between", py: 1 }}>
+                    {/* Logo and Brand */}
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            cursor: "pointer",
+                            "&:hover": {
+                                opacity: 0.8,
+                            },
+                        }}
+                        onClick={() => navigate("/")}
+                    >
                         <Box
-                            display="flex"
-                            alignItems="center"
-                            sx={{ cursor: "pointer" }}
-                            onClick={() => navigate("/")}
+                            sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: "12px",
+                                background:
+                                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                mr: 2,
+                            }}
                         >
-                            <Box
-                                sx={{
-                                    mr: 2,
-                                    p: 1.5,
-                                    borderRadius: "12px",
-                                    background:
-                                        "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    boxShadow:
-                                        "0 4px 12px rgba(99, 102, 241, 0.3)",
-                                }}
-                            >
-                                <Code
-                                    sx={{ color: "white", fontSize: "24px" }}
-                                />
-                            </Box>
-                            <Typography
-                                variant="h5"
-                                component="div"
-                                sx={{
-                                    fontWeight: 700,
-                                    background:
-                                        "linear-gradient(135deg, #1f2937 0%, #6366f1 100%)",
-                                    WebkitBackgroundClip: "text",
-                                    WebkitTextFillColor: "transparent",
-                                    letterSpacing: "-0.01em",
-                                }}
-                            >
-                                Snippetify
-                            </Typography>
+                            <CodeIcon
+                                sx={{ color: "white", fontSize: "20px" }}
+                            />
                         </Box>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                fontWeight: 700,
+                                fontSize: "1.5rem",
+                                background:
+                                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                backgroundClip: "text",
+                            }}
+                        >
+                            Snippetify
+                        </Typography>
+                    </Box>
+
+                    {/* Right side actions */}
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                        {/* Dark Mode Toggle */}
+                        <IconButton
+                            onClick={toggleDarkMode}
+                            sx={{
+                                color: darkMode ? "#f3f4f6" : "#374151",
+                                backgroundColor: darkMode
+                                    ? "#374151"
+                                    : "#f3f4f6",
+                                "&:hover": {
+                                    backgroundColor: darkMode
+                                        ? "#4b5563"
+                                        : "#e5e7eb",
+                                },
+                            }}
+                        >
+                            {darkMode ? <LightModeIcon /> : <DarkModeIcon />}
+                        </IconButton>
 
                         {user ? (
-                            <Box display="flex" alignItems="center" gap={2}>
-                                <Chip
-                                    label={`Hi, ${
-                                        user.firstName || user.username
-                                    }!`}
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 1,
+                                }}
+                            >
+                                {/* Dashboard Button */}
+                                <Button
                                     variant="outlined"
+                                    startIcon={<DashboardIcon />}
+                                    onClick={() => navigate("/dashboard")}
                                     sx={{
-                                        borderColor: "rgba(99, 102, 241, 0.3)",
-                                        color: "#6366f1",
-                                        fontWeight: 500,
-                                        "& .MuiChip-label": {
-                                            px: 2,
-                                        },
-                                    }}
-                                />
-                                <IconButton
-                                    size="large"
-                                    aria-label="account menu"
-                                    onClick={handleMenu}
-                                    sx={{
-                                        background:
-                                            "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                                        color: "white",
+                                        borderRadius: "10px",
+                                        borderColor: darkMode
+                                            ? "#475569"
+                                            : "#d1d5db",
+                                        color: darkMode ? "#f3f4f6" : "#374151",
                                         "&:hover": {
-                                            background:
-                                                "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-                                            transform: "scale(1.05)",
+                                            borderColor: darkMode
+                                                ? "#667eea"
+                                                : "#3b82f6",
+                                            backgroundColor: darkMode
+                                                ? "rgba(102, 126, 234, 0.1)"
+                                                : "rgba(59, 130, 246, 0.05)",
                                         },
                                     }}
+                                >
+                                    Dashboard
+                                </Button>
+
+                                {/* Profile Menu */}
+                                <IconButton
+                                    onClick={handleProfileMenuOpen}
+                                    sx={{ p: 0 }}
                                 >
                                     <Avatar
                                         sx={{
-                                            width: 36,
-                                            height: 36,
-                                            bgcolor: "transparent",
+                                            width: 40,
+                                            height: 40,
+                                            bgcolor: "primary.main",
+                                            fontSize: "1rem",
+                                            fontWeight: 600,
                                         }}
                                     >
-                                        <Person />
+                                        {user.firstName
+                                            ? user.firstName[0].toUpperCase()
+                                            : user.username[0].toUpperCase()}
                                     </Avatar>
                                 </IconButton>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleClose}
-                                    sx={{
-                                        "& .MuiPaper-root": {
-                                            background:
-                                                "rgba(255, 255, 255, 0.95)",
-                                            backdropFilter: "blur(20px)",
-                                            border: "1px solid rgba(229, 231, 235, 0.5)",
-                                            borderRadius: "12px",
-                                            boxShadow:
-                                                "0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                                            mt: 1,
-                                        },
-                                    }}
-                                >
-                                    <MenuItem
-                                        onClick={handleDashboard}
-                                        sx={{
-                                            borderRadius: "8px",
-                                            mx: 1,
-                                            my: 0.5,
-                                            "&:hover": {
-                                                backgroundColor:
-                                                    "rgba(99, 102, 241, 0.04)",
-                                            },
-                                        }}
-                                    >
-                                        <DashboardIcon
-                                            sx={{ mr: 1, fontSize: "20px" }}
-                                        />
-                                        Dashboard
-                                    </MenuItem>
-                                    <MenuItem
-                                        onClick={handleLogout}
-                                        sx={{
-                                            borderRadius: "8px",
-                                            mx: 1,
-                                            my: 0.5,
-                                            "&:hover": {
-                                                backgroundColor:
-                                                    "rgba(239, 68, 68, 0.04)",
-                                                color: "#ef4444",
-                                            },
-                                        }}
-                                    >
-                                        Logout
-                                    </MenuItem>
-                                </Menu>
                             </Box>
                         ) : (
-                            <Box display="flex" gap={2} alignItems="center">
+                            <Box sx={{ display: "flex", gap: 1 }}>
                                 <Button
                                     variant="outlined"
                                     onClick={() => setShowLogin(true)}
                                     sx={{
-                                        borderRadius: "12px",
-                                        px: 3,
-                                        py: 1,
-                                        borderColor: "rgba(99, 102, 241, 0.3)",
-                                        color: "#6366f1",
+                                        borderRadius: "10px",
+                                        borderColor: darkMode
+                                            ? "#475569"
+                                            : "#d1d5db",
+                                        color: darkMode ? "#f3f4f6" : "#374151",
                                         "&:hover": {
-                                            borderColor: "#6366f1",
-                                            backgroundColor:
-                                                "rgba(99, 102, 241, 0.04)",
-                                            transform: "translateY(-1px)",
+                                            borderColor: darkMode
+                                                ? "#667eea"
+                                                : "#3b82f6",
+                                            backgroundColor: darkMode
+                                                ? "rgba(102, 126, 234, 0.1)"
+                                                : "rgba(59, 130, 246, 0.05)",
                                         },
                                     }}
                                 >
@@ -212,57 +234,81 @@ const Header = ({ user, setUser }) => {
                                 </Button>
                                 <Button
                                     variant="contained"
-                                    className="beautiful-button"
                                     onClick={() => setShowSignup(true)}
                                     sx={{
-                                        borderRadius: "12px",
-                                        px: 3,
-                                        py: 1,
+                                        borderRadius: "10px",
                                         background:
-                                            "linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)",
-                                        boxShadow:
-                                            "0 4px 12px rgba(99, 102, 241, 0.3)",
+                                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                                         "&:hover": {
                                             background:
-                                                "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-                                            transform: "translateY(-2px)",
-                                            boxShadow:
-                                                "0 8px 20px rgba(99, 102, 241, 0.4)",
+                                                "linear-gradient(135deg, #5a6fd8 0%, #6b4190 100%)",
+                                            transform: "translateY(-1px)",
                                         },
                                     }}
                                 >
-                                    Get Started
+                                    Sign Up
                                 </Button>
                             </Box>
                         )}
-                    </Toolbar>
-                </Container>
+                    </Box>
+                </Toolbar>
             </AppBar>
 
+            {/* Profile Menu */}
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleProfileMenuClose}
+                PaperProps={{
+                    sx: {
+                        mt: 1,
+                        borderRadius: "12px",
+                        minWidth: 200,
+                        backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                        border: `1px solid ${darkMode ? "#475569" : "#e5e7eb"}`,
+                    },
+                }}
+            >
+                <Box sx={{ px: 2, py: 1 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        {user?.firstName || user?.username}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        {user?.email}
+                    </Typography>
+                </Box>
+                <Divider />
+                <MenuItem
+                    onClick={() => {
+                        navigate("/dashboard");
+                        handleProfileMenuClose();
+                    }}
+                    sx={{ gap: 2 }}
+                >
+                    <DashboardIcon fontSize="small" />
+                    Dashboard
+                </MenuItem>
+                <MenuItem
+                    onClick={handleLogout}
+                    sx={{ gap: 2, color: "error.main" }}
+                >
+                    <LogoutIcon fontSize="small" />
+                    Logout
+                </MenuItem>
+            </Menu>
+
+            {/* Auth Modals */}
             <LoginForm
                 open={showLogin}
                 onClose={() => setShowLogin(false)}
-                onSuccess={(userData) => {
-                    setUser(userData.user);
-                    setShowLogin(false);
-                }}
-                onSwitchToSignup={() => {
-                    setShowLogin(false);
-                    setShowSignup(true);
-                }}
+                onSuccess={handleAuthSuccess}
+                onSwitchToSignup={switchToSignup}
             />
-
             <SignupForm
                 open={showSignup}
                 onClose={() => setShowSignup(false)}
-                onSuccess={(userData) => {
-                    setUser(userData.user);
-                    setShowSignup(false);
-                }}
-                onSwitchToLogin={() => {
-                    setShowSignup(false);
-                    setShowLogin(true);
-                }}
+                onSuccess={handleAuthSuccess}
+                onSwitchToLogin={switchToLogin}
             />
         </>
     );

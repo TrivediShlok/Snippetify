@@ -17,8 +17,10 @@ import {
     Chip,
     Switch,
     FormControlLabel,
+    InputLabel,
 } from "@mui/material";
 import { Close, Save, Code } from "@mui/icons-material";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const SnippetEditor = ({
     initialData,
@@ -27,6 +29,7 @@ const SnippetEditor = ({
     onSave,
     onCancel,
 }) => {
+    const { darkMode } = useTheme();
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -79,12 +82,11 @@ const SnippetEditor = ({
                 language:
                     initialData.programmingLanguage ||
                     initialData.language ||
-                    "", // Handle both field names
+                    "",
                 tags: initialData.tags || [],
                 isPublic: initialData.isPublic || false,
             });
         } else {
-            // Reset form for new snippet
             setFormData({
                 title: "",
                 description: "",
@@ -103,7 +105,6 @@ const SnippetEditor = ({
             ...prev,
             [name]: type === "checkbox" ? checked : value,
         }));
-        // Clear error when user starts editing
         if (error) setError("");
     };
 
@@ -132,7 +133,6 @@ const SnippetEditor = ({
         e.preventDefault();
         setError("");
 
-        // Validation
         if (!formData.title.trim()) {
             setError("Title is required");
             return;
@@ -163,8 +163,10 @@ const SnippetEditor = ({
             fullWidth
             PaperProps={{
                 sx: {
-                    borderRadius: "16px",
-                    minHeight: "600px",
+                    borderRadius: "20px",
+                    minHeight: "700px",
+                    backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    backgroundImage: "none",
                 },
             }}
         >
@@ -174,29 +176,59 @@ const SnippetEditor = ({
                     justifyContent: "space-between",
                     alignItems: "center",
                     pb: 2,
+                    backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    color: darkMode ? "#f1f5f9" : "#1f2937",
                 }}
             >
                 <Typography
                     variant="h5"
                     component="div"
-                    sx={{ fontWeight: 600 }}
+                    sx={{
+                        fontWeight: 700,
+                        color: darkMode ? "#f1f5f9" : "#1f2937",
+                    }}
                 >
                     {isEditing ? "Edit Snippet" : "Create New Snippet"}
                 </Typography>
-                <IconButton onClick={onCancel} disabled={isSaving}>
+                <IconButton
+                    onClick={onCancel}
+                    disabled={isSaving}
+                    sx={{
+                        color: darkMode ? "#94a3b8" : "#6b7280",
+                        "&:hover": {
+                            backgroundColor: darkMode ? "#374151" : "#f3f4f6",
+                        },
+                    }}
+                >
                     <Close />
                 </IconButton>
             </DialogTitle>
 
             <form onSubmit={handleSubmit}>
-                <DialogContent sx={{ pb: 2 }}>
+                <DialogContent
+                    sx={{
+                        pb: 2,
+                        backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    }}
+                >
                     {error && (
-                        <Alert severity="error" sx={{ mb: 3 }}>
+                        <Alert
+                            severity="error"
+                            sx={{
+                                mb: 3,
+                                backgroundColor: darkMode
+                                    ? "#991b1b"
+                                    : undefined,
+                                color: darkMode ? "#fecaca" : undefined,
+                                "& .MuiAlert-icon": {
+                                    color: darkMode ? "#fecaca" : undefined,
+                                },
+                            }}
+                        >
                             {error}
                         </Alert>
                     )}
 
-                    {/* Title */}
                     <TextField
                         fullWidth
                         label="Title"
@@ -205,10 +237,40 @@ const SnippetEditor = ({
                         onChange={handleChange}
                         required
                         disabled={isSaving}
-                        sx={{ mb: 3 }}
+                        sx={{
+                            mb: 3,
+                            "& .MuiOutlinedInput-root": {
+                                backgroundColor: darkMode
+                                    ? "#334155"
+                                    : "#ffffff",
+                                "& fieldset": {
+                                    borderColor: darkMode
+                                        ? "#475569"
+                                        : "#d1d5db",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: darkMode
+                                        ? "#667eea"
+                                        : "#3b82f6",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: darkMode
+                                        ? "#667eea"
+                                        : "#3b82f6",
+                                },
+                            },
+                            "& .MuiInputLabel-root": {
+                                color: darkMode ? "#94a3b8" : "#6b7280",
+                                "&.Mui-focused": {
+                                    color: darkMode ? "#667eea" : "#3b82f6",
+                                },
+                            },
+                            "& .MuiOutlinedInput-input": {
+                                color: darkMode ? "#f1f5f9" : "#1f2937",
+                            },
+                        }}
                     />
 
-                    {/* Description */}
                     <TextField
                         fullWidth
                         label="Description"
@@ -218,36 +280,106 @@ const SnippetEditor = ({
                         multiline
                         rows={2}
                         disabled={isSaving}
-                        sx={{ mb: 3 }}
+                        sx={{
+                            mb: 3,
+                            "& .MuiOutlinedInput-root": {
+                                backgroundColor: darkMode
+                                    ? "#334155"
+                                    : "#ffffff",
+                                "& fieldset": {
+                                    borderColor: darkMode
+                                        ? "#475569"
+                                        : "#d1d5db",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: darkMode
+                                        ? "#667eea"
+                                        : "#3b82f6",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: darkMode
+                                        ? "#667eea"
+                                        : "#3b82f6",
+                                },
+                            },
+                            "& .MuiInputLabel-root": {
+                                color: darkMode ? "#94a3b8" : "#6b7280",
+                                "&.Mui-focused": {
+                                    color: darkMode ? "#667eea" : "#3b82f6",
+                                },
+                            },
+                            "& .MuiOutlinedInput-input": {
+                                color: darkMode ? "#f1f5f9" : "#1f2937",
+                            },
+                        }}
                     />
 
-                    {/* Language and Visibility Row */}
                     <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
                         <Box sx={{ flex: 1 }}>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{
-                                    mb: 1,
-                                    fontWeight: 600,
-                                    color: "#374151",
-                                }}
-                            >
-                                Programming Language
-                            </Typography>
                             <FormControl fullWidth>
+                                <InputLabel
+                                    sx={{
+                                        color: darkMode ? "#94a3b8" : "#6b7280",
+                                        "&.Mui-focused": {
+                                            color: darkMode
+                                                ? "#667eea"
+                                                : "#3b82f6",
+                                        },
+                                    }}
+                                >
+                                    Programming Language
+                                </InputLabel>
                                 <Select
                                     name="language"
                                     value={formData.language}
                                     onChange={handleChange}
                                     required
                                     disabled={isSaving}
-                                    displayEmpty
+                                    label="Programming Language"
                                     sx={{
-                                        borderRadius: "12px",
+                                        backgroundColor: darkMode
+                                            ? "#334155"
+                                            : "#ffffff",
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                            borderColor: darkMode
+                                                ? "#475569"
+                                                : "#d1d5db",
+                                        },
+                                        "&:hover .MuiOutlinedInput-notchedOutline":
+                                            {
+                                                borderColor: darkMode
+                                                    ? "#667eea"
+                                                    : "#3b82f6",
+                                            },
+                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                            {
+                                                borderColor: darkMode
+                                                    ? "#667eea"
+                                                    : "#3b82f6",
+                                            },
                                         "& .MuiSelect-select": {
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: 1,
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937",
+                                        },
+                                        "& .MuiSvgIcon-root": {
+                                            color: darkMode
+                                                ? "#94a3b8"
+                                                : "#6b7280",
+                                        },
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: darkMode
+                                                    ? "#1e293b"
+                                                    : "#ffffff",
+                                                border: `1px solid ${
+                                                    darkMode
+                                                        ? "#475569"
+                                                        : "#e5e7eb"
+                                                }`,
+                                            },
                                         },
                                     }}
                                 >
@@ -257,7 +389,9 @@ const SnippetEditor = ({
                                                 display: "flex",
                                                 alignItems: "center",
                                                 gap: 1,
-                                                color: "#9ca3af",
+                                                color: darkMode
+                                                    ? "#94a3b8"
+                                                    : "#9ca3af",
                                             }}
                                         >
                                             <Code fontSize="small" />
@@ -265,7 +399,20 @@ const SnippetEditor = ({
                                         </Box>
                                     </MenuItem>
                                     {languages.map((lang) => (
-                                        <MenuItem key={lang} value={lang}>
+                                        <MenuItem
+                                            key={lang}
+                                            value={lang}
+                                            sx={{
+                                                color: darkMode
+                                                    ? "#f1f5f9"
+                                                    : "#1f2937",
+                                                "&:hover": {
+                                                    backgroundColor: darkMode
+                                                        ? "#374151"
+                                                        : "#f3f4f6",
+                                                },
+                                            }}
+                                        >
                                             <Box
                                                 sx={{
                                                     display: "flex",
@@ -296,19 +443,41 @@ const SnippetEditor = ({
                                         checked={formData.isPublic}
                                         onChange={handleChange}
                                         disabled={isSaving}
+                                        sx={{
+                                            "& .MuiSwitch-switchBase.Mui-checked":
+                                                {
+                                                    color: "#667eea",
+                                                    "&:hover": {
+                                                        backgroundColor:
+                                                            "rgba(102, 126, 234, 0.1)",
+                                                    },
+                                                },
+                                            "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                                                {
+                                                    backgroundColor: "#667eea",
+                                                },
+                                        }}
                                     />
                                 }
                                 label="Make this snippet public"
-                                sx={{ mt: 3 }}
+                                sx={{
+                                    mt: 3,
+                                    "& .MuiFormControlLabel-label": {
+                                        color: darkMode ? "#94a3b8" : "#6b7280",
+                                    },
+                                }}
                             />
                         </Box>
                     </Box>
 
-                    {/* Tags */}
                     <Box sx={{ mb: 3 }}>
                         <Typography
                             variant="subtitle2"
-                            sx={{ mb: 1, fontWeight: 600, color: "#374151" }}
+                            sx={{
+                                mb: 1,
+                                fontWeight: 600,
+                                color: darkMode ? "#94a3b8" : "#374151",
+                            }}
                         >
                             Tags
                         </Typography>
@@ -319,7 +488,32 @@ const SnippetEditor = ({
                             onChange={(e) => setTagInput(e.target.value)}
                             onKeyPress={handleAddTag}
                             disabled={isSaving}
-                            sx={{ mb: 1 }}
+                            sx={{
+                                mb: 1,
+                                "& .MuiOutlinedInput-root": {
+                                    backgroundColor: darkMode
+                                        ? "#334155"
+                                        : "#ffffff",
+                                    "& fieldset": {
+                                        borderColor: darkMode
+                                            ? "#475569"
+                                            : "#d1d5db",
+                                    },
+                                    "&:hover fieldset": {
+                                        borderColor: darkMode
+                                            ? "#667eea"
+                                            : "#3b82f6",
+                                    },
+                                    "&.Mui-focused fieldset": {
+                                        borderColor: darkMode
+                                            ? "#667eea"
+                                            : "#3b82f6",
+                                    },
+                                },
+                                "& .MuiOutlinedInput-input": {
+                                    color: darkMode ? "#f1f5f9" : "#1f2937",
+                                },
+                            }}
                         />
                         <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                             {formData.tags.map((tag, index) => (
@@ -329,15 +523,34 @@ const SnippetEditor = ({
                                     onDelete={() => handleRemoveTag(tag)}
                                     size="small"
                                     disabled={isSaving}
+                                    sx={{
+                                        backgroundColor: darkMode
+                                            ? "#374151"
+                                            : "#f3f4f6",
+                                        color: darkMode ? "#f1f5f9" : "#1f2937",
+                                        "& .MuiChip-deleteIcon": {
+                                            color: darkMode
+                                                ? "#94a3b8"
+                                                : "#6b7280",
+                                            "&:hover": {
+                                                color: darkMode
+                                                    ? "#ef4444"
+                                                    : "#ef4444",
+                                            },
+                                        },
+                                    }}
                                 />
                             ))}
                         </Box>
                     </Box>
 
-                    {/* Code */}
                     <Typography
                         variant="subtitle2"
-                        sx={{ mb: 1, fontWeight: 600, color: "#374151" }}
+                        sx={{
+                            mb: 1,
+                            fontWeight: 600,
+                            color: darkMode ? "#94a3b8" : "#374151",
+                        }}
                     >
                         Code
                     </Typography>
@@ -348,23 +561,58 @@ const SnippetEditor = ({
                         onChange={handleChange}
                         required
                         multiline
-                        rows={12}
+                        rows={15}
                         disabled={isSaving}
                         sx={{
                             "& .MuiInputBase-input": {
                                 fontFamily:
-                                    '"Fira Code", "Consolas", "Monaco", monospace',
+                                    '"Fira Code", "JetBrains Mono", "Consolas", "Monaco", monospace',
                                 fontSize: "14px",
+                                color: darkMode ? "#f1f5f9" : "#1f2937",
+                            },
+                            "& .MuiOutlinedInput-root": {
+                                backgroundColor: darkMode
+                                    ? "#0f172a"
+                                    : "#f8fafc",
+                                "& fieldset": {
+                                    borderColor: darkMode
+                                        ? "#475569"
+                                        : "#d1d5db",
+                                },
+                                "&:hover fieldset": {
+                                    borderColor: darkMode
+                                        ? "#667eea"
+                                        : "#3b82f6",
+                                },
+                                "&.Mui-focused fieldset": {
+                                    borderColor: darkMode
+                                        ? "#667eea"
+                                        : "#3b82f6",
+                                },
                             },
                         }}
                     />
                 </DialogContent>
 
-                <DialogActions sx={{ p: 3, pt: 0 }}>
+                <DialogActions
+                    sx={{
+                        p: 3,
+                        pt: 0,
+                        backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    }}
+                >
                     <Button
                         onClick={onCancel}
                         disabled={isSaving}
-                        sx={{ mr: 1 }}
+                        sx={{
+                            mr: 1,
+                            color: darkMode ? "#94a3b8" : "#6b7280",
+                            "&:hover": {
+                                backgroundColor: darkMode
+                                    ? "#374151"
+                                    : "#f3f4f6",
+                            },
+                        }}
                     >
                         Cancel
                     </Button>
@@ -379,6 +627,10 @@ const SnippetEditor = ({
                             background:
                                 "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                             px: 3,
+                            "&:hover": {
+                                background:
+                                    "linear-gradient(135deg, #5a6fd8 0%, #6b4190 100%)",
+                            },
                         }}
                     >
                         {isSaving
