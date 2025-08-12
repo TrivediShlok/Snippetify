@@ -51,6 +51,10 @@ mongoose
 app.use("/api/auth", authRoutes);
 app.use("/api/snippets", snippetRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/collections", require("./routes/collectionRoutes"));
+app.use("/api/shared", require("./routes/sharedRoutes"));
+
+
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {

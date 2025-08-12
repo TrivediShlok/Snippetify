@@ -3,42 +3,49 @@ import { apiRequest } from "./api";
 const snippetService = {
     async getSnippets(params = {}) {
         try {
-            const cleanParams = Object.entries(params).reduce(
-                (acc, [key, value]) => {
-                    if (value !== undefined && value !== null && value !== "") {
-                        acc[key] = value;
-                    }
-                    return acc;
-                },
-                {}
+            const queryParams = new URLSearchParams();
+
+            Object.keys(params).forEach((key) => {
+                if (params[key] !== undefined && params[key] !== "") {
+                    queryParams.append(key, params[key]);
+                }
+            });
+
+            console.log("Frontend: Getting snippets with params:", params);
+            console.log("Frontend: Query string:", queryParams.toString());
+
+            const response = await apiRequest(
+                `/snippets?${queryParams.toString()}`
             );
 
-            const queryString = new URLSearchParams(cleanParams).toString();
-            const endpoint = `/snippets${queryString ? `?${queryString}` : ""}`;
+            if (!response.success) {
+                throw new Error(response.message || "Failed to fetch snippets");
+            }
 
-            return await apiRequest(endpoint);
+            return response;
         } catch (error) {
-            console.error("Get snippets error:", error);
+            console.error("Frontend: Get snippets error:", error);
+            throw error;
+        }
+    },
+
+    async getSnippet(id) {
+        try {
+            const response = await apiRequest(`/snippets/${id}`);
+
+            if (!response.success) {
+                throw new Error(response.message || "Failed to fetch snippet");
+            }
+
+            return response;
+        } catch (error) {
+            console.error("Get snippet error:", error);
             throw error;
         }
     },
 
     async createSnippet(snippetData) {
         try {
-            console.log("Frontend: Creating snippet with data:", snippetData);
-
-            // Validate required fields
-            if (!snippetData.title?.trim()) {
-                throw new Error("Title is required");
-            }
-            if (!snippetData.code?.trim()) {
-                throw new Error("Code is required");
-            }
-            if (!snippetData.language) {
-                throw new Error("Language is required");
-            }
-
-            // Clean data
             const cleanData = {
                 title: snippetData.title.trim(),
                 description: (snippetData.description || "").trim(),
@@ -46,109 +53,176 @@ const snippetService = {
                 language: snippetData.language.toLowerCase().trim(),
                 tags: Array.isArray(snippetData.tags)
                     ? snippetData.tags
-                          .filter((tag) => tag && tag.trim())
-                          .map((tag) => tag.trim())
+                          .filter((tag) => tag && typeof tag === "string")
+                          .map((tag) => tag.trim().toLowerCase())
+                          .filter((tag) => tag.length > 0)
                     : [],
                 isPublic: Boolean(snippetData.isPublic),
+                collection: snippetData.collection || null,
             };
-
-            console.log("Frontend: Sending cleaned data:", cleanData);
 
             const response = await apiRequest("/snippets", {
                 method: "POST",
                 body: JSON.stringify(cleanData),
             });
 
-            console.log("Frontend: Received response:", response);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to create snippet");
+            }
+
             return response;
         } catch (error) {
-            console.error("Frontend: Create snippet error:", error);
+            console.error("Create snippet error:", error);
             throw error;
         }
     },
 
-      async updateSnippet(id, snippetData) {
-    try {
-      console.log('Frontend: Updating snippet with ID:', id);
-      console.log('Frontend: Update data:', snippetData);
+    async updateSnippet(id, snippetData) {
+        try {
+            if (!id) {
+                throw new Error("Snippet ID is required");
+            }
 
-      if (!id) {
-        throw new Error('Snippet ID is required');
-      }
+            const cleanData = {
+                title: snippetData.title.trim(),
+                description: (snippetData.description || "").trim(),
+                code: snippetData.code.trim(),
+                language: snippetData.language.toLowerCase().trim(),
+                tags: Array.isArray(snippetData.tags)
+                    ? snippetData.tags
+                          .filter((tag) => tag && typeof tag === "string")
+                          .map((tag) => tag.trim().toLowerCase())
+                          .filter((tag) => tag.length > 0)
+                    : [],
+                isPublic: Boolean(snippetData.isPublic),
+                collection: snippetData.collection || null,
+            };
 
-      // Validate required fields
-      if (!snippetData.title?.trim()) {
-        throw new Error('Title is required');
-      }
-      if (!snippetData.code?.trim()) {
-        throw new Error('Code is required');
-      }
-      if (!snippetData.language) {
-        throw new Error('Language is required');
-      }
+            const response = await apiRequest(`/snippets/${id}`, {
+                method: "PUT",
+                body: JSON.stringify(cleanData),
+            });
 
-      // Clean and format the data properly
-      const cleanData = {
-        title: snippetData.title.trim(),
-        description: (snippetData.description || '').trim(),
-        code: snippetData.code.trim(),
-        language: snippetData.language.toLowerCase().trim(), // Frontend still sends 'language'
-        tags: Array.isArray(snippetData.tags) 
-          ? snippetData.tags
-              .filter(tag => tag && typeof tag === 'string')
-              .map(tag => tag.trim().toLowerCase())
-              .filter(tag => tag.length > 0)
-          : [],
-        isPublic: Boolean(snippetData.isPublic)
-      };
+            if (!response.success) {
+                throw new Error(response.message || "Failed to update snippet");
+            }
 
-      console.log('Frontend: Sending cleaned update data:', cleanData);
-
-      const response = await apiRequest(`/snippets/${id}`, {
-        method: 'PUT',
-        body: JSON.stringify(cleanData),
-      });
-      
-      console.log('Frontend: Update response:', response);
-      
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to update snippet');
-      }
-      
-      return response;
-    } catch (error) {
-      console.error('Frontend: Update snippet error:', error);
-      throw error;
-    }
-  },
+            return response;
+        } catch (error) {
+            console.error("Update snippet error:", error);
+            throw error;
+        }
+    },
 
     async deleteSnippet(id) {
         try {
-            return await apiRequest(`/snippets/${id}`, {
+            const response = await apiRequest(`/snippets/${id}`, {
                 method: "DELETE",
             });
+
+            if (!response.success) {
+                throw new Error(response.message || "Failed to delete snippet");
+            }
+
+            return response;
         } catch (error) {
             console.error("Delete snippet error:", error);
             throw error;
         }
     },
 
-    async getSnippet(id) {
+    async toggleLike(id) {
         try {
-            return await apiRequest(`/snippets/${id}`);
+            const response = await apiRequest(`/snippets/${id}/like`, {
+                method: "POST",
+            });
+
+            if (!response.success) {
+                throw new Error(response.message || "Failed to toggle like");
+            }
+
+            return response;
         } catch (error) {
-            console.error("Get snippet error:", error);
+            console.error("Toggle like error:", error);
             throw error;
         }
     },
 
-    async toggleLike(id) {
+    async exportSnippets(format = "json", snippetIds = []) {
         try {
-            return await apiRequest(`/snippets/${id}/like`, {
-                method: "POST",
-            });
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/snippets/export`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
+                    },
+                    body: JSON.stringify({ format, snippetIds }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Export failed");
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `snippetify-export-${Date.now()}.${
+                format === "zip" ? "zip" : "json"
+            }`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            return { success: true };
         } catch (error) {
-            console.error("Toggle like error:", error);
+            console.error("Export error:", error);
+            throw error;
+        }
+    },
+
+    async createSharedLink(id, options = {}) {
+        try {
+            const response = await apiRequest(`/snippets/${id}/share`, {
+                method: "POST",
+                body: JSON.stringify(options),
+            });
+
+            if (!response.success) {
+                throw new Error(
+                    response.message || "Failed to create shared link"
+                );
+            }
+
+            return response;
+        } catch (error) {
+            console.error("Create shared link error:", error);
+            throw error;
+        }
+    },
+
+    async getSharedSnippet(linkId) {
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_URL}/shared/${linkId}`
+            );
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(
+                    data.message || "Failed to fetch shared snippet"
+                );
+            }
+
+            return data;
+        } catch (error) {
+            console.error("Get shared snippet error:", error);
             throw error;
         }
     },

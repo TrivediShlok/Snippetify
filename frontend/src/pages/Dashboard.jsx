@@ -15,6 +15,16 @@ import {
     InputAdornment,
     Card,
     CardContent,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    IconButton,
+    Tooltip,
+    Menu,
+    ListItemIcon,
+    ListItemText,
+    Divider,
 } from "@mui/material";
 import {
     Add,
@@ -25,24 +35,49 @@ import {
     Public,
     Lock,
     Tune,
+    CreateNewFolder,
+    Folder,
+    FolderOpen,
+    FileDownload,
+    Share,
+    MoreVert,
+    Collections,
+    ViewModule,
+    ViewList,
 } from "@mui/icons-material";
 import { useTheme } from "../contexts/ThemeContext";
 import { snippetService } from "../services/snippetService";
+import { collectionService } from "../services/collectionService";
 import SnippetList from "../components/snippets/SnippetList";
 import SnippetEditor from "../components/snippets/SnippetEditor";
+import CollectionDialog from "../components/collections/CollectionDialog";
+import ShareDialog from "../components/sharing/ShareDialog";
+import ExportDialog from "../components/export/ExportDialog";
 import toast from "react-hot-toast";
 
 const Dashboard = ({ user }) => {
     const { darkMode } = useTheme();
     const [snippets, setSnippets] = useState([]);
+    const [collections, setCollections] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showEditor, setShowEditor] = useState(false);
     const [editSnippet, setEditSnippet] = useState(null);
     const [saving, setSaving] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [languageFilter, setLanguageFilter] = useState("");
-    const [publicFilter, setPublicFilter] = useState("");
+    const [publicFilter, setPublicFilter] = useState(""); // Fixed: proper state management
+    const [collectionFilter, setCollectionFilter] = useState("all");
+    const [sortBy, setSortBy] = useState("createdAt");
+    const [sortOrder, setSortOrder] = useState("desc");
+    const [viewMode, setViewMode] = useState("grid"); // grid or list
     const [error, setError] = useState("");
+    const [showCollectionDialog, setShowCollectionDialog] = useState(false);
+    const [showShareDialog, setShowShareDialog] = useState(false);
+    const [showExportDialog, setShowExportDialog] = useState(false);
+    const [selectedSnippets, setSelectedSnippets] = useState([]);
+    const [shareSnippet, setShareSnippet] = useState(null);
+    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+
     const [pagination, setPagination] = useState({
         current: 1,
         pages: 1,
@@ -58,13 +93,23 @@ const Dashboard = ({ user }) => {
             const params = {
                 page,
                 limit: 12,
+                sortBy,
+                sortOrder,
             };
 
             if (searchTerm.trim()) params.search = searchTerm.trim();
             if (languageFilter) params.language = languageFilter;
-            if (publicFilter) params.isPublic = publicFilter;
 
-            console.log("Loading snippets with params:", params);
+            // FIXED: Proper public filter handling
+            if (publicFilter !== "") {
+                params.isPublic = publicFilter;
+            }
+
+            if (collectionFilter !== "all") {
+                params.collection = collectionFilter;
+            }
+
+            console.log("Dashboard: Loading snippets with params:", params);
             const response = await snippetService.getSnippets(params);
 
             if (response.success) {
@@ -96,19 +141,39 @@ const Dashboard = ({ user }) => {
         }
     };
 
+    const loadCollections = async () => {
+        try {
+            const response = await collectionService.getCollections();
+            if (response.success) {
+                setCollections(response.data.collections || []);
+            }
+        } catch (error) {
+            console.error("Load collections error:", error);
+        }
+    };
+
     useEffect(() => {
         loadSnippets();
-    }, [searchTerm, languageFilter, publicFilter]);
+    }, [
+        searchTerm,
+        languageFilter,
+        publicFilter,
+        collectionFilter,
+        sortBy,
+        sortOrder,
+    ]);
+
+    useEffect(() => {
+        loadCollections();
+    }, []);
 
     const handleEdit = (snippet) => {
-        console.log("Editing snippet:", snippet);
         setEditSnippet(snippet);
         setShowEditor(true);
         setError("");
     };
 
     const handleSave = async (data) => {
-        console.log("Dashboard handleSave called with:", data);
         setSaving(true);
         setError("");
 
@@ -125,7 +190,6 @@ const Dashboard = ({ user }) => {
 
             let response;
             if (editSnippet) {
-                console.log("Updating existing snippet:", editSnippet._id);
                 response = await snippetService.updateSnippet(
                     editSnippet._id,
                     data
@@ -137,7 +201,6 @@ const Dashboard = ({ user }) => {
                     },
                 });
             } else {
-                console.log("Creating new snippet");
                 response = await snippetService.createSnippet(data);
                 toast.success("Snippet created successfully!", {
                     style: {
@@ -151,6 +214,9 @@ const Dashboard = ({ user }) => {
                 setShowEditor(false);
                 setEditSnippet(null);
                 await loadSnippets();
+                if (data.collection) {
+                    await loadCollections(); // Reload collections if snippet was added to one
+                }
             } else {
                 throw new Error(response.message || "Failed to save snippet");
             }
@@ -176,9 +242,7 @@ const Dashboard = ({ user }) => {
         }
 
         try {
-            console.log("Deleting snippet:", id);
             const response = await snippetService.deleteSnippet(id);
-
             if (response.success) {
                 toast.success("Snippet deleted successfully!", {
                     style: {
@@ -240,19 +304,30 @@ const Dashboard = ({ user }) => {
         }
     };
 
-    const handleCancel = () => {
-        setShowEditor(false);
-        setEditSnippet(null);
-        setError("");
+    const handleShare = (snippet) => {
+        setShareSnippet(snippet);
+        setShowShareDialog(true);
+    };
+
+    const handleCollectionCreated = () => {
+        loadCollections();
+        setShowCollectionDialog(false);
     };
 
     const clearFilters = () => {
         setSearchTerm("");
         setLanguageFilter("");
-        setPublicFilter("");
+        setPublicFilter(""); // Fixed: proper clearing
+        setCollectionFilter("all");
+        setSortBy("createdAt");
+        setSortOrder("desc");
     };
 
-    const hasActiveFilters = searchTerm || languageFilter || publicFilter;
+    const hasActiveFilters =
+        searchTerm ||
+        languageFilter ||
+        publicFilter !== "" ||
+        collectionFilter !== "all";
 
     // Get unique languages for filter
     const languages = [
@@ -261,7 +336,7 @@ const Dashboard = ({ user }) => {
 
     return (
         <Container maxWidth="xl" sx={{ py: 4 }}>
-            {/* Header */}
+            {/* Enhanced Header */}
             <Paper
                 elevation={0}
                 sx={{
@@ -275,7 +350,7 @@ const Dashboard = ({ user }) => {
                         : "0 8px 30px rgba(0,0,0,0.08)",
                 }}
             >
-                {/* Title Section */}
+                {/* Title and Stats Section */}
                 <Box
                     sx={{
                         display: "flex",
@@ -297,46 +372,180 @@ const Dashboard = ({ user }) => {
                         >
                             My Code Snippets
                         </Typography>
-                        <Typography
-                            variant="h6"
+                        <Box
                             sx={{
-                                color: darkMode ? "#94a3b8" : "#6b7280",
-                                fontWeight: 400,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 3,
+                                flexWrap: "wrap",
                             }}
                         >
-                            {pagination.total} snippet
-                            {pagination.total !== 1 ? "s" : ""} in your
-                            collection
-                        </Typography>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    color: darkMode ? "#94a3b8" : "#6b7280",
+                                    fontWeight: 400,
+                                }}
+                            >
+                                {pagination.total} snippet
+                                {pagination.total !== 1 ? "s" : ""} total
+                            </Typography>
+                            <Chip
+                                icon={<Collections />}
+                                label={`${collections.length} collection${
+                                    collections.length !== 1 ? "s" : ""
+                                }`}
+                                variant="outlined"
+                                sx={{
+                                    borderColor: darkMode
+                                        ? "#475569"
+                                        : "#d1d5db",
+                                    color: darkMode ? "#94a3b8" : "#6b7280",
+                                }}
+                            />
+                        </Box>
                     </Box>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        startIcon={<Add />}
-                        onClick={() => {
-                            setEditSnippet(null);
-                            setShowEditor(true);
-                            setError("");
-                        }}
-                        sx={{
-                            background:
-                                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                            borderRadius: "16px",
-                            px: 4,
-                            py: 2,
-                            fontSize: "1.1rem",
-                            fontWeight: 600,
-                            boxShadow: "0 12px 30px rgba(102, 126, 234, 0.4)",
-                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                            "&:hover": {
+
+                    <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                        {/* View Mode Toggle */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                border: `1px solid ${
+                                    darkMode ? "#475569" : "#e5e7eb"
+                                }`,
+                                borderRadius: "8px",
+                            }}
+                        >
+                            <Tooltip title="Grid View">
+                                <IconButton
+                                    size="small"
+                                    onClick={() => setViewMode("grid")}
+                                    sx={{
+                                        color:
+                                            viewMode === "grid"
+                                                ? "#667eea"
+                                                : darkMode
+                                                ? "#94a3b8"
+                                                : "#6b7280",
+                                        backgroundColor:
+                                            viewMode === "grid"
+                                                ? darkMode
+                                                    ? "#334155"
+                                                    : "#f1f5f9"
+                                                : "transparent",
+                                    }}
+                                >
+                                    <ViewModule />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title="List View">
+                                <IconButton
+                                    size="small"
+                                    onClick={() => setViewMode("list")}
+                                    sx={{
+                                        color:
+                                            viewMode === "list"
+                                                ? "#667eea"
+                                                : darkMode
+                                                ? "#94a3b8"
+                                                : "#6b7280",
+                                        backgroundColor:
+                                            viewMode === "list"
+                                                ? darkMode
+                                                    ? "#334155"
+                                                    : "#f1f5f9"
+                                                : "transparent",
+                                    }}
+                                >
+                                    <ViewList />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
+
+                        {/* More Actions Menu */}
+                        <Tooltip title="More Actions">
+                            <IconButton
+                                onClick={(e) =>
+                                    setMenuAnchorEl(e.currentTarget)
+                                }
+                                sx={{ color: darkMode ? "#94a3b8" : "#6b7280" }}
+                            >
+                                <MoreVert />
+                            </IconButton>
+                        </Tooltip>
+
+                        <Menu
+                            anchorEl={menuAnchorEl}
+                            open={Boolean(menuAnchorEl)}
+                            onClose={() => setMenuAnchorEl(null)}
+                            PaperProps={{
+                                sx: {
+                                    backgroundColor: darkMode
+                                        ? "#1e293b"
+                                        : "#ffffff",
+                                    border: `1px solid ${
+                                        darkMode ? "#475569" : "#e5e7eb"
+                                    }`,
+                                },
+                            }}
+                        >
+                            <MenuItem
+                                onClick={() => {
+                                    setShowCollectionDialog(true);
+                                    setMenuAnchorEl(null);
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <CreateNewFolder />
+                                </ListItemIcon>
+                                <ListItemText>New Collection</ListItemText>
+                            </MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    setShowExportDialog(true);
+                                    setMenuAnchorEl(null);
+                                }}
+                            >
+                                <ListItemIcon>
+                                    <FileDownload />
+                                </ListItemIcon>
+                                <ListItemText>Export Snippets</ListItemText>
+                            </MenuItem>
+                        </Menu>
+
+                        {/* Create Button */}
+                        <Button
+                            variant="contained"
+                            size="large"
+                            startIcon={<Add />}
+                            onClick={() => {
+                                setEditSnippet(null);
+                                setShowEditor(true);
+                                setError("");
+                            }}
+                            sx={{
+                                background:
+                                    "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                borderRadius: "16px",
+                                px: 4,
+                                py: 2,
+                                fontSize: "1.1rem",
+                                fontWeight: 600,
                                 boxShadow:
-                                    "0 16px 40px rgba(102, 126, 234, 0.5)",
-                                transform: "translateY(-3px)",
-                            },
-                        }}
-                    >
-                        Create New Snippet
-                    </Button>
+                                    "0 12px 30px rgba(102, 126, 234, 0.4)",
+                                transition:
+                                    "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                "&:hover": {
+                                    boxShadow:
+                                        "0 16px 40px rgba(102, 126, 234, 0.5)",
+                                    transform: "translateY(-3px)",
+                                },
+                            }}
+                        >
+                            Create New Snippet
+                        </Button>
+                    </Box>
                 </Box>
 
                 {/* Error Alert */}
@@ -348,12 +557,6 @@ const Dashboard = ({ user }) => {
                             borderRadius: "12px",
                             backgroundColor: darkMode ? "#991b1b" : undefined,
                             color: darkMode ? "#fecaca" : undefined,
-                            "& .MuiAlert-message": {
-                                fontSize: "1rem",
-                            },
-                            "& .MuiAlert-icon": {
-                                color: darkMode ? "#fecaca" : undefined,
-                            },
                         }}
                         onClose={() => setError("")}
                     >
@@ -361,14 +564,13 @@ const Dashboard = ({ user }) => {
                     </Alert>
                 )}
 
-                {/* DARK MODE ENHANCED Filter Section */}
+                {/* Enhanced Filter Section */}
                 <Card
                     elevation={0}
                     sx={{
                         backgroundColor: darkMode ? "#334155" : "#f8fafc",
                         border: `2px solid ${darkMode ? "#475569" : "#e2e8f0"}`,
                         borderRadius: "16px",
-                        overflow: "visible",
                     }}
                 >
                     <CardContent sx={{ p: 3 }}>
@@ -411,7 +613,12 @@ const Dashboard = ({ user }) => {
                                         [
                                             searchTerm,
                                             languageFilter,
-                                            publicFilter,
+                                            publicFilter !== ""
+                                                ? "visibility"
+                                                : "",
+                                            collectionFilter !== "all"
+                                                ? "collection"
+                                                : "",
                                         ].filter(Boolean).length
                                     } active`}
                                     size="small"
@@ -428,25 +635,21 @@ const Dashboard = ({ user }) => {
 
                         <Grid container spacing={3}>
                             {/* Search Input */}
-                            <Grid item xs={12} lg={6}>
-                                <Box sx={{ mb: 1 }}>
-                                    <Typography
-                                        variant="subtitle2"
-                                        sx={{
-                                            color: darkMode
-                                                ? "#f1f5f9"
-                                                : "#374151",
-                                            fontWeight: 600,
-                                            mb: 1,
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: 1,
-                                        }}
-                                    >
-                                        <Search fontSize="small" />
-                                        Search Snippets
-                                    </Typography>
-                                </Box>
+                            <Grid item xs={12} lg={4}>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#374151",
+                                        fontWeight: 600,
+                                        mb: 1,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Search fontSize="small" />
+                                    Search Snippets
+                                </Typography>
                                 <TextField
                                     fullWidth
                                     placeholder="Search by title, description, or tags..."
@@ -505,26 +708,155 @@ const Dashboard = ({ user }) => {
                                 />
                             </Grid>
 
-                            {/* Language Filter */}
-                            <Grid item xs={12} sm={6} lg={3}>
-                                <Box sx={{ mb: 1 }}>
-                                    <Typography
-                                        variant="subtitle2"
-                                        sx={{
+                            {/* Collection Filter */}
+                            <Grid item xs={12} sm={6} lg={2}>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#374151",
+                                        fontWeight: 600,
+                                        mb: 1,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Folder fontSize="small" />
+                                    Collection
+                                </Typography>
+                                <Select
+                                    fullWidth
+                                    value={collectionFilter}
+                                    onChange={(e) =>
+                                        setCollectionFilter(e.target.value)
+                                    }
+                                    displayEmpty
+                                    sx={{
+                                        backgroundColor: darkMode
+                                            ? "#1e293b"
+                                            : "#ffffff",
+                                        borderRadius: "12px",
+                                        height: "56px",
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                            borderColor: darkMode
+                                                ? "#475569"
+                                                : "#d1d5db",
+                                            borderWidth: "2px",
+                                        },
+                                        "&:hover .MuiOutlinedInput-notchedOutline":
+                                            {
+                                                borderColor: darkMode
+                                                    ? "#667eea"
+                                                    : "#9ca3af",
+                                            },
+                                        "&.Mui-focused .MuiOutlinedInput-notchedOutline":
+                                            {
+                                                borderColor: "#3b82f6",
+                                                borderWidth: "2px",
+                                            },
+                                        "& .MuiSelect-select": {
                                             color: darkMode
                                                 ? "#f1f5f9"
-                                                : "#374151",
-                                            fontWeight: 600,
-                                            mb: 1,
+                                                : "#1f2937",
                                             display: "flex",
                                             alignItems: "center",
                                             gap: 1,
-                                        }}
-                                    >
-                                        <Code fontSize="small" />
-                                        Language
-                                    </Typography>
-                                </Box>
+                                        },
+                                        "& .MuiSvgIcon-root": {
+                                            color: darkMode
+                                                ? "#94a3b8"
+                                                : "#9ca3af",
+                                        },
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: darkMode
+                                                    ? "#1e293b"
+                                                    : "#ffffff",
+                                                border: `1px solid ${
+                                                    darkMode
+                                                        ? "#475569"
+                                                        : "#e5e7eb"
+                                                }`,
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value="all">
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: 1,
+                                                color: darkMode
+                                                    ? "#94a3b8"
+                                                    : "#9ca3af",
+                                            }}
+                                        >
+                                            <Folder fontSize="small" />
+                                            All Collections
+                                        </Box>
+                                    </MenuItem>
+                                    <MenuItem value="uncategorized">
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: 1,
+                                                color: darkMode
+                                                    ? "#f1f5f9"
+                                                    : "#1f2937",
+                                            }}
+                                        >
+                                            <FolderOpen fontSize="small" />
+                                            Uncategorized
+                                        </Box>
+                                    </MenuItem>
+                                    {collections.map((collection) => (
+                                        <MenuItem
+                                            key={collection._id}
+                                            value={collection._id}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 1,
+                                                    color: darkMode
+                                                        ? "#f1f5f9"
+                                                        : "#1f2937",
+                                                }}
+                                            >
+                                                <Folder
+                                                    fontSize="small"
+                                                    sx={{
+                                                        color: collection.color,
+                                                    }}
+                                                />
+                                                {collection.name}
+                                            </Box>
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </Grid>
+
+                            {/* Language Filter */}
+                            <Grid item xs={12} sm={6} lg={2}>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#374151",
+                                        fontWeight: 600,
+                                        mb: 1,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Code fontSize="small" />
+                                    Language
+                                </Typography>
                                 <Select
                                     fullWidth
                                     value={languageFilter}
@@ -538,7 +870,6 @@ const Dashboard = ({ user }) => {
                                             : "#ffffff",
                                         borderRadius: "12px",
                                         height: "56px",
-                                        fontSize: "1rem",
                                         "& .MuiOutlinedInput-notchedOutline": {
                                             borderColor: darkMode
                                                 ? "#475569"
@@ -557,16 +888,12 @@ const Dashboard = ({ user }) => {
                                                 borderWidth: "2px",
                                             },
                                         "& .MuiSelect-select": {
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937",
                                             display: "flex",
                                             alignItems: "center",
                                             gap: 1,
-                                            color: languageFilter
-                                                ? darkMode
-                                                    ? "#f1f5f9"
-                                                    : "#1f2937"
-                                                : darkMode
-                                                ? "#94a3b8"
-                                                : "#9ca3af",
                                         },
                                         "& .MuiSvgIcon-root": {
                                             color: darkMode
@@ -577,13 +904,9 @@ const Dashboard = ({ user }) => {
                                     MenuProps={{
                                         PaperProps: {
                                             sx: {
-                                                borderRadius: "12px",
-                                                mt: 1,
                                                 backgroundColor: darkMode
                                                     ? "#1e293b"
                                                     : "#ffffff",
-                                                boxShadow:
-                                                    "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
                                                 border: `1px solid ${
                                                     darkMode
                                                         ? "#475569"
@@ -593,24 +916,15 @@ const Dashboard = ({ user }) => {
                                         },
                                     }}
                                 >
-                                    <MenuItem
-                                        value=""
-                                        sx={{
-                                            color: darkMode
-                                                ? "#94a3b8"
-                                                : "#9ca3af",
-                                            "&:hover": {
-                                                backgroundColor: darkMode
-                                                    ? "#374151"
-                                                    : "#f3f4f6",
-                                            },
-                                        }}
-                                    >
+                                    <MenuItem value="">
                                         <Box
                                             sx={{
                                                 display: "flex",
                                                 alignItems: "center",
                                                 gap: 1,
+                                                color: darkMode
+                                                    ? "#94a3b8"
+                                                    : "#9ca3af",
                                             }}
                                         >
                                             <Code fontSize="small" />
@@ -618,35 +932,18 @@ const Dashboard = ({ user }) => {
                                         </Box>
                                     </MenuItem>
                                     {languages.sort().map((lang) => (
-                                        <MenuItem
-                                            key={lang}
-                                            value={lang}
-                                            sx={{
-                                                color: darkMode
-                                                    ? "#f1f5f9"
-                                                    : "#1f2937",
-                                                "&:hover": {
-                                                    backgroundColor: darkMode
-                                                        ? "#374151"
-                                                        : "#f3f4f6",
-                                                },
-                                            }}
-                                        >
+                                        <MenuItem key={lang} value={lang}>
                                             <Box
                                                 sx={{
                                                     display: "flex",
                                                     alignItems: "center",
                                                     gap: 1,
+                                                    color: darkMode
+                                                        ? "#f1f5f9"
+                                                        : "#1f2937",
                                                 }}
                                             >
-                                                <Code
-                                                    fontSize="small"
-                                                    sx={{
-                                                        color: darkMode
-                                                            ? "#94a3b8"
-                                                            : "#6b7280",
-                                                    }}
-                                                />
+                                                <Code fontSize="small" />
                                                 {lang.toUpperCase()}
                                             </Box>
                                         </MenuItem>
@@ -654,32 +951,33 @@ const Dashboard = ({ user }) => {
                                 </Select>
                             </Grid>
 
-                            {/* Visibility Filter */}
-                            <Grid item xs={12} sm={6} lg={3}>
-                                <Box sx={{ mb: 1 }}>
-                                    <Typography
-                                        variant="subtitle2"
-                                        sx={{
-                                            color: darkMode
-                                                ? "#f1f5f9"
-                                                : "#374151",
-                                            fontWeight: 600,
-                                            mb: 1,
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: 1,
-                                        }}
-                                    >
-                                        <Public fontSize="small" />
-                                        Visibility
-                                    </Typography>
-                                </Box>
+                            {/* Visibility Filter - FIXED */}
+                            <Grid item xs={12} sm={6} lg={2}>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#374151",
+                                        fontWeight: 600,
+                                        mb: 1,
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Public fontSize="small" />
+                                    Visibility
+                                </Typography>
                                 <Select
                                     fullWidth
                                     value={publicFilter}
-                                    onChange={(e) =>
-                                        setPublicFilter(e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        console.log(
+                                            "Dashboard: Setting publicFilter to:",
+                                            value
+                                        );
+                                        setPublicFilter(value);
+                                    }}
                                     displayEmpty
                                     sx={{
                                         backgroundColor: darkMode
@@ -687,7 +985,6 @@ const Dashboard = ({ user }) => {
                                             : "#ffffff",
                                         borderRadius: "12px",
                                         height: "56px",
-                                        fontSize: "1rem",
                                         "& .MuiOutlinedInput-notchedOutline": {
                                             borderColor: darkMode
                                                 ? "#475569"
@@ -706,16 +1003,12 @@ const Dashboard = ({ user }) => {
                                                 borderWidth: "2px",
                                             },
                                         "& .MuiSelect-select": {
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937",
                                             display: "flex",
                                             alignItems: "center",
                                             gap: 1,
-                                            color: publicFilter
-                                                ? darkMode
-                                                    ? "#f1f5f9"
-                                                    : "#1f2937"
-                                                : darkMode
-                                                ? "#94a3b8"
-                                                : "#9ca3af",
                                         },
                                         "& .MuiSvgIcon-root": {
                                             color: darkMode
@@ -726,13 +1019,9 @@ const Dashboard = ({ user }) => {
                                     MenuProps={{
                                         PaperProps: {
                                             sx: {
-                                                borderRadius: "12px",
-                                                mt: 1,
                                                 backgroundColor: darkMode
                                                     ? "#1e293b"
                                                     : "#ffffff",
-                                                boxShadow:
-                                                    "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
                                                 border: `1px solid ${
                                                     darkMode
                                                         ? "#475569"
@@ -742,48 +1031,30 @@ const Dashboard = ({ user }) => {
                                         },
                                     }}
                                 >
-                                    <MenuItem
-                                        value=""
-                                        sx={{
-                                            color: darkMode
-                                                ? "#94a3b8"
-                                                : "#9ca3af",
-                                            "&:hover": {
-                                                backgroundColor: darkMode
-                                                    ? "#374151"
-                                                    : "#f3f4f6",
-                                            },
-                                        }}
-                                    >
+                                    <MenuItem value="">
                                         <Box
                                             sx={{
                                                 display: "flex",
                                                 alignItems: "center",
                                                 gap: 1,
+                                                color: darkMode
+                                                    ? "#94a3b8"
+                                                    : "#9ca3af",
                                             }}
                                         >
                                             <Public fontSize="small" />
                                             All Snippets
                                         </Box>
                                     </MenuItem>
-                                    <MenuItem
-                                        value="true"
-                                        sx={{
-                                            color: darkMode
-                                                ? "#f1f5f9"
-                                                : "#1f2937",
-                                            "&:hover": {
-                                                backgroundColor: darkMode
-                                                    ? "#374151"
-                                                    : "#f3f4f6",
-                                            },
-                                        }}
-                                    >
+                                    <MenuItem value="true">
                                         <Box
                                             sx={{
                                                 display: "flex",
                                                 alignItems: "center",
                                                 gap: 1,
+                                                color: darkMode
+                                                    ? "#f1f5f9"
+                                                    : "#1f2937",
                                             }}
                                         >
                                             <Public
@@ -793,24 +1064,15 @@ const Dashboard = ({ user }) => {
                                             Public Only
                                         </Box>
                                     </MenuItem>
-                                    <MenuItem
-                                        value="false"
-                                        sx={{
-                                            color: darkMode
-                                                ? "#f1f5f9"
-                                                : "#1f2937",
-                                            "&:hover": {
-                                                backgroundColor: darkMode
-                                                    ? "#374151"
-                                                    : "#f3f4f6",
-                                            },
-                                        }}
-                                    >
+                                    <MenuItem value="false">
                                         <Box
                                             sx={{
                                                 display: "flex",
                                                 alignItems: "center",
                                                 gap: 1,
+                                                color: darkMode
+                                                    ? "#f1f5f9"
+                                                    : "#1f2937",
                                             }}
                                         >
                                             <Lock
@@ -819,6 +1081,77 @@ const Dashboard = ({ user }) => {
                                             />
                                             Private Only
                                         </Box>
+                                    </MenuItem>
+                                </Select>
+                            </Grid>
+
+                            {/* Sort Options */}
+                            <Grid item xs={12} sm={6} lg={2}>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#374151",
+                                        fontWeight: 600,
+                                        mb: 1,
+                                    }}
+                                >
+                                    Sort By
+                                </Typography>
+                                <Select
+                                    fullWidth
+                                    value={`${sortBy}-${sortOrder}`}
+                                    onChange={(e) => {
+                                        const [field, order] =
+                                            e.target.value.split("-");
+                                        setSortBy(field);
+                                        setSortOrder(order);
+                                    }}
+                                    sx={{
+                                        backgroundColor: darkMode
+                                            ? "#1e293b"
+                                            : "#ffffff",
+                                        borderRadius: "12px",
+                                        height: "56px",
+                                        "& .MuiOutlinedInput-notchedOutline": {
+                                            borderColor: darkMode
+                                                ? "#475569"
+                                                : "#d1d5db",
+                                            borderWidth: "2px",
+                                        },
+                                        "& .MuiSelect-select": {
+                                            color: darkMode
+                                                ? "#f1f5f9"
+                                                : "#1f2937",
+                                        },
+                                    }}
+                                    MenuProps={{
+                                        PaperProps: {
+                                            sx: {
+                                                backgroundColor: darkMode
+                                                    ? "#1e293b"
+                                                    : "#ffffff",
+                                                border: `1px solid ${
+                                                    darkMode
+                                                        ? "#475569"
+                                                        : "#e5e7eb"
+                                                }`,
+                                            },
+                                        },
+                                    }}
+                                >
+                                    <MenuItem value="createdAt-desc">
+                                        Newest First
+                                    </MenuItem>
+                                    <MenuItem value="createdAt-asc">
+                                        Oldest First
+                                    </MenuItem>
+                                    <MenuItem value="lastModified-desc">
+                                        Recently Modified
+                                    </MenuItem>
+                                    <MenuItem value="title-asc">A-Z</MenuItem>
+                                    <MenuItem value="title-desc">Z-A</MenuItem>
+                                    <MenuItem value="views-desc">
+                                        Most Viewed
                                     </MenuItem>
                                 </Select>
                             </Grid>
@@ -871,14 +1204,10 @@ const Dashboard = ({ user }) => {
                                                     setSearchTerm("")
                                                 }
                                                 size="medium"
-                                                variant="filled"
                                                 sx={{
                                                     backgroundColor: "#dbeafe",
                                                     color: "#1e40af",
                                                     fontWeight: 600,
-                                                    "& .MuiChip-deleteIcon": {
-                                                        color: "#1e40af",
-                                                    },
                                                 }}
                                             />
                                         )}
@@ -890,18 +1219,14 @@ const Dashboard = ({ user }) => {
                                                     setLanguageFilter("")
                                                 }
                                                 size="medium"
-                                                variant="filled"
                                                 sx={{
                                                     backgroundColor: "#dcfce7",
                                                     color: "#166534",
                                                     fontWeight: 600,
-                                                    "& .MuiChip-deleteIcon": {
-                                                        color: "#166534",
-                                                    },
                                                 }}
                                             />
                                         )}
-                                        {publicFilter && (
+                                        {publicFilter !== "" && (
                                             <Chip
                                                 icon={
                                                     publicFilter === "true" ? (
@@ -919,14 +1244,37 @@ const Dashboard = ({ user }) => {
                                                     setPublicFilter("")
                                                 }
                                                 size="medium"
-                                                variant="filled"
                                                 sx={{
                                                     backgroundColor: "#fed7aa",
                                                     color: "#c2410c",
                                                     fontWeight: 600,
-                                                    "& .MuiChip-deleteIcon": {
-                                                        color: "#c2410c",
-                                                    },
+                                                }}
+                                            />
+                                        )}
+                                        {collectionFilter !== "all" && (
+                                            <Chip
+                                                icon={
+                                                    <Folder fontSize="small" />
+                                                }
+                                                label={
+                                                    collectionFilter ===
+                                                    "uncategorized"
+                                                        ? "Uncategorized"
+                                                        : collections.find(
+                                                              (c) =>
+                                                                  c._id ===
+                                                                  collectionFilter
+                                                          )?.name ||
+                                                          "Collection"
+                                                }
+                                                onDelete={() =>
+                                                    setCollectionFilter("all")
+                                                }
+                                                size="medium"
+                                                sx={{
+                                                    backgroundColor: "#f3e8ff",
+                                                    color: "#7c3aed",
+                                                    fontWeight: 600,
                                                 }}
                                             />
                                         )}
@@ -969,8 +1317,13 @@ const Dashboard = ({ user }) => {
                         initialData={editSnippet}
                         isEditing={!!editSnippet}
                         isSaving={saving}
+                        collections={collections}
                         onSave={handleSave}
-                        onCancel={handleCancel}
+                        onCancel={() => {
+                            setShowEditor(false);
+                            setEditSnippet(null);
+                            setError("");
+                        }}
                     />
                 </Box>
             )}
@@ -1060,10 +1413,6 @@ const Dashboard = ({ user }) => {
                                     fontWeight: 600,
                                     background:
                                         "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-                                    "&:hover": {
-                                        background:
-                                            "linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)",
-                                    },
                                 }}
                             >
                                 Clear All Filters
@@ -1085,11 +1434,6 @@ const Dashboard = ({ user }) => {
                                     fontWeight: 600,
                                     background:
                                         "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                    "&:hover": {
-                                        transform: "translateY(-2px)",
-                                        boxShadow:
-                                            "0 12px 30px rgba(102, 126, 234, 0.4)",
-                                    },
                                 }}
                             >
                                 Create Your First Snippet
@@ -1102,7 +1446,11 @@ const Dashboard = ({ user }) => {
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         onToggleLike={handleToggleLike}
+                        onShare={handleShare}
                         user={user}
+                        viewMode={viewMode}
+                        selectedSnippets={selectedSnippets}
+                        onSelectionChange={setSelectedSnippets}
                     />
                 )}
             </Paper>
@@ -1138,21 +1486,10 @@ const Dashboard = ({ user }) => {
                                     borderRadius: "12px",
                                     px: 3,
                                     fontWeight: 600,
-                                    borderColor: darkMode
-                                        ? "#475569"
-                                        : "#d1d5db",
-                                    color: darkMode ? "#f1f5f9" : "#374151",
-                                    "&:hover": {
-                                        borderColor: "#667eea",
-                                        backgroundColor: darkMode
-                                            ? "rgba(102, 126, 234, 0.1)"
-                                            : "rgba(102, 126, 234, 0.05)",
-                                    },
                                 }}
                             >
                                 Previous
                             </Button>
-
                             <Typography
                                 sx={{
                                     px: 4,
@@ -1168,7 +1505,6 @@ const Dashboard = ({ user }) => {
                             >
                                 Page {pagination.current} of {pagination.pages}
                             </Typography>
-
                             <Button
                                 variant="outlined"
                                 disabled={!pagination.hasNext}
@@ -1179,16 +1515,6 @@ const Dashboard = ({ user }) => {
                                     borderRadius: "12px",
                                     px: 3,
                                     fontWeight: 600,
-                                    borderColor: darkMode
-                                        ? "#475569"
-                                        : "#d1d5db",
-                                    color: darkMode ? "#f1f5f9" : "#374151",
-                                    "&:hover": {
-                                        borderColor: "#667eea",
-                                        backgroundColor: darkMode
-                                            ? "rgba(102, 126, 234, 0.1)"
-                                            : "rgba(102, 126, 234, 0.05)",
-                                    },
                                 }}
                             >
                                 Next
@@ -1197,6 +1523,33 @@ const Dashboard = ({ user }) => {
                     </Paper>
                 </Box>
             )}
+
+            {/* Dialogs */}
+            <CollectionDialog
+                open={showCollectionDialog}
+                onClose={() => setShowCollectionDialog(false)}
+                onSuccess={handleCollectionCreated}
+            />
+
+            <ShareDialog
+                open={showShareDialog}
+                snippet={shareSnippet}
+                onClose={() => {
+                    setShowShareDialog(false);
+                    setShareSnippet(null);
+                }}
+            />
+
+            <ExportDialog
+                open={showExportDialog}
+                snippets={
+                    selectedSnippets.length > 0 ? selectedSnippets : snippets
+                }
+                onClose={() => {
+                    setShowExportDialog(false);
+                    setSelectedSnippets([]);
+                }}
+            />
         </Container>
     );
 };

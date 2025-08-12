@@ -1,4 +1,5 @@
 const express = require("express");
+const router = express.Router();
 const {
     getSnippets,
     getSnippet,
@@ -6,17 +7,21 @@ const {
     updateSnippet,
     deleteSnippet,
     toggleLike,
+    exportSnippets,
+    createSharedLink,
 } = require("../controllers/snippetController");
-const { auth, optionalAuth } = require("../middleware/auth");
+const { protect } = require("../middleware/authMiddleware");
 
-const router = express.Router();
+// Protected routes
+router.use(protect);
 
-// Routes
-router.get("/", optionalAuth, getSnippets);
-router.get("/:id", optionalAuth, getSnippet);
-router.post("/", auth, createSnippet);
-router.put("/:id", auth, updateSnippet);
-router.delete("/:id", auth, deleteSnippet);
-router.post("/:id/like", auth, toggleLike);
+router.route("/").get(getSnippets).post(createSnippet);
+
+router.post("/export", exportSnippets);
+
+router.route("/:id").get(getSnippet).put(updateSnippet).delete(deleteSnippet);
+
+router.post("/:id/like", toggleLike);
+router.post("/:id/share", createSharedLink);
 
 module.exports = router;
