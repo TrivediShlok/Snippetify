@@ -12,46 +12,51 @@ const snippetSchema = new mongoose.Schema(
             type: String,
             trim: true,
             maxlength: [500, "Description cannot exceed 500 characters"],
+            default: "",
         },
         code: {
             type: String,
             required: [true, "Code is required"],
             maxlength: [50000, "Code cannot exceed 50000 characters"],
         },
-        language: {
+        programmingLanguage: {
+            // RENAMED FROM 'language' TO AVOID MONGODB CONFLICT
             type: String,
             required: [true, "Programming language is required"],
             lowercase: true,
-            enum: [
-                "javascript",
-                "python",
-                "java",
-                "c",
-                "cpp",
-                "csharp",
-                "php",
-                "ruby",
-                "go",
-                "rust",
-                "typescript",
-                "html",
-                "css",
-                "scss",
-                "sql",
-                "bash",
-                "powershell",
-                "json",
-                "xml",
-                "yaml",
-                "markdown",
-                "swift",
-                "kotlin",
-                "dart",
-                "scala",
-                "r",
-                "matlab",
-                "other",
-            ],
+            enum: {
+                values: [
+                    "javascript",
+                    "python",
+                    "java",
+                    "c",
+                    "cpp",
+                    "csharp",
+                    "php",
+                    "ruby",
+                    "go",
+                    "rust",
+                    "typescript",
+                    "html",
+                    "css",
+                    "scss",
+                    "sql",
+                    "bash",
+                    "powershell",
+                    "json",
+                    "xml",
+                    "yaml",
+                    "markdown",
+                    "swift",
+                    "kotlin",
+                    "dart",
+                    "scala",
+                    "r",
+                    "matlab",
+                    "other",
+                ],
+                message: "Please select a valid programming language",
+            },
         },
         tags: [
             {
@@ -64,7 +69,7 @@ const snippetSchema = new mongoose.Schema(
         author: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: [true, "Author is required"],
         },
         isPublic: {
             type: Boolean,
@@ -104,10 +109,6 @@ const snippetSchema = new mongoose.Schema(
                 },
             },
         ],
-        isFavorite: {
-            type: Boolean,
-            default: false,
-        },
         lastModified: {
             type: Date,
             default: Date.now,
@@ -132,11 +133,10 @@ snippetSchema.virtual("commentCount").get(function () {
 
 // Indexes for better performance
 snippetSchema.index({ author: 1 });
-snippetSchema.index({ language: 1 });
+snippetSchema.index({ programmingLanguage: 1 }); // UPDATED INDEX
 snippetSchema.index({ tags: 1 });
 snippetSchema.index({ isPublic: 1 });
 snippetSchema.index({ createdAt: -1 });
-snippetSchema.index({ title: "text", description: "text" });
 
 // Update lastModified on save
 snippetSchema.pre("save", function (next) {

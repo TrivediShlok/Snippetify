@@ -10,6 +10,7 @@ const validate = (req, res, next) => {
             errors: errors.array().map((error) => ({
                 field: error.param,
                 message: error.msg,
+                value: error.value,
             })),
         });
     }
@@ -56,17 +57,21 @@ const loginValidation = [
     body("password").notEmpty().withMessage("Password is required"),
 ];
 
-// Snippet validation
+// Enhanced snippet validation
 const snippetValidation = [
     body("title")
+        .trim()
         .isLength({ min: 1, max: 100 })
         .withMessage("Title is required and cannot exceed 100 characters"),
 
     body("code")
+        .trim()
         .isLength({ min: 1, max: 50000 })
         .withMessage("Code is required and cannot exceed 50000 characters"),
 
     body("language")
+        .trim()
+        .toLowerCase()
         .isIn([
             "javascript",
             "python",
@@ -101,15 +106,30 @@ const snippetValidation = [
 
     body("description")
         .optional()
+        .trim()
         .isLength({ max: 500 })
         .withMessage("Description cannot exceed 500 characters"),
 
-    body("tags").optional().isArray().withMessage("Tags must be an array"),
-
-    body("tags.*")
+    body("tags")
         .optional()
-        .isLength({ max: 30 })
-        .withMessage("Each tag cannot exceed 30 characters"),
+        .isArray()
+        .withMessage("Tags must be an array")
+        .custom((tags) => {
+            if (tags && Array.isArray(tags)) {
+                for (let tag of tags) {
+                    if (
+                        typeof tag !== "string" ||
+                        tag.trim().length === 0 ||
+                        tag.trim().length > 30
+                    ) {
+                        throw new Error(
+                            "Each tag must be a non-empty string with maximum 30 characters"
+                        );
+                    }
+                }
+            }
+            return true;
+        }),
 
     body("isPublic")
         .optional()
