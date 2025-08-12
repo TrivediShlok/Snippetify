@@ -7,6 +7,11 @@ import {
     Grid,
     Paper,
     Chip,
+    Avatar,
+    Card,
+    CardContent,
+    Fade,
+    Grow,
 } from "@mui/material";
 import {
     Code,
@@ -17,6 +22,9 @@ import {
     Star,
     TrendingUp,
     Speed,
+    Dashboard,
+    AutoAwesome,
+    Celebration,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -24,7 +32,7 @@ const TypingEffect = () => {
     const messages = [
         "Snippetify",
         "One Stop Solution",
-        "Code Management",
+        "Of Your Code Management",
     ];
 
     const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
@@ -75,6 +83,10 @@ const TypingEffect = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
             }}
         >
             {currentText}
@@ -160,129 +172,174 @@ const Home = ({ user }) => {
 
     return (
         <Container maxWidth="xl" sx={{ py: 4 }}>
-            {/* Hero Section with Better Spacing */}
-            <Box
-                sx={{
-                    backgroundColor: "#ffffff",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "16px",
-                    padding: { xs: "40px 24px", md: "60px 32px" },
-                    marginBottom: "48px", // Increased spacing
-                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-                    textAlign: "center",
-                }}
-            >
-                {/* Typing Effect Title */}
-                <TypingEffect />
-
-                <Typography
-                    variant="h5"
+            {/* Hero Section */}
+            <Fade in={true} timeout={1000}>
+                <Box
                     sx={{
-                        color: "#6b7280",
-                        mb: 6, // Increased spacing
-                        fontSize: { xs: "1.1rem", md: "1.25rem" },
-                        maxWidth: "600px",
-                        mx: "auto",
-                        lineHeight: 1.6,
+                        backgroundColor: "#ffffff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: "24px",
+                        padding: { xs: "40px 24px", md: "60px 32px" },
+                        marginBottom: "48px",
+                        boxShadow:
+                            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                        textAlign: "center",
+                        background:
+                            "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+                        position: "relative",
+                        overflow: "hidden",
+                        "&::before": {
+                            content: '""',
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background:
+                                "radial-gradient(circle at 30% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 50%)",
+                            pointerEvents: "none",
+                        },
                     }}
                 >
-                    The modern way to store, organize, and share your code
-                    snippets. Built for developers who value efficiency and
-                    clean code.
-                </Typography>
+                    <Box sx={{ position: "relative", zIndex: 1 }}>
+                        {/* Typing Effect Title */}
+                        <TypingEffect />
 
-                {user ? (
-                    <Box>
-                        <Chip
-                            label={`Welcome back, ${
-                                user.firstName || user.username
-                            }!`}
+                        <Typography
+                            variant="h5"
                             sx={{
-                                mb: 4, // Increased spacing
-                                backgroundColor: "#ecfdf5",
-                                color: "#059669",
-                                fontWeight: 600,
-                                border: "1px solid #a7f3d0",
-                                fontSize: "1rem",
-                                py: 1,
-                                px: 2,
-                            }}
-                        />
-                        <Button
-                            variant="contained"
-                            size="large"
-                            onClick={() => navigate("/dashboard")}
-                            startIcon={<Rocket />}
-                            sx={{
-                                fontSize: "1.1rem",
-                                py: 1.5,
-                                px: 4,
-                                borderRadius: "10px",
-                                backgroundColor: "#3b82f6",
-                                "&:hover": {
-                                    backgroundColor: "#2563eb",
-                                },
+                                color: "#6b7280",
+                                mb: 6,
+                                fontSize: { xs: "1.1rem", md: "1.25rem" },
+                                maxWidth: "600px",
+                                mx: "auto",
+                                lineHeight: 1.6,
+                                opacity: 0.9,
                             }}
                         >
-                            Open Dashboard
-                        </Button>
+                            The modern way to store, organize, and share your
+                            code snippets. Built for developers who value
+                            efficiency and clean code.
+                        </Typography>
+
+                        {user ? (
+                            <Grow in={true} timeout={1200}>
+                                <Box>
+
+                                    {/* Enhanced Dashboard Button */}
+                                    <Button
+                                        variant="contained"
+                                        size="large"
+                                        onClick={() => navigate("/dashboard")}
+                                        startIcon={<Dashboard />}
+                                        endIcon={<Rocket />}
+                                        sx={{
+                                            fontSize: "1.1rem",
+                                            fontWeight: 700,
+                                            py: 2,
+                                            px: 6,
+                                            borderRadius: "50px",
+                                            background:
+                                                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                            boxShadow:
+                                                "0 10px 25px rgba(102, 126, 234, 0.4)",
+                                            textTransform: "none",
+                                            position: "relative",
+                                            overflow: "hidden",
+                                            transition:
+                                                "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                                            "&::before": {
+                                                content: '""',
+                                                position: "absolute",
+                                                top: 0,
+                                                left: "-100%",
+                                                width: "100%",
+                                                height: "100%",
+                                                background:
+                                                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)",
+                                                transition: "left 0.6s ease",
+                                            },
+                                            "&:hover": {
+                                                transform:
+                                                    "translateY(-3px) scale(1.02)",
+                                                boxShadow:
+                                                    "0 20px 40px rgba(102, 126, 234, 0.6)",
+                                                "&::before": {
+                                                    left: "100%",
+                                                },
+                                            },
+                                            "&:active": {
+                                                transform:
+                                                    "translateY(-1px) scale(0.98)",
+                                            },
+                                        }}
+                                    >
+                                        Open Dashboard
+                                    </Button>
+                                </Box>
+                            </Grow>
+                        ) : (
+                            <Box
+                                display="flex"
+                                gap={3}
+                                justifyContent="center"
+                                flexWrap="wrap"
+                            >
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    sx={{
+                                        fontSize: "1.1rem",
+                                        py: 1.5,
+                                        px: 4,
+                                        borderRadius: "12px",
+                                        background:
+                                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                                        boxShadow:
+                                            "0 8px 25px rgba(102, 126, 234, 0.3)",
+                                        "&:hover": {
+                                            boxShadow:
+                                                "0 12px 35px rgba(102, 126, 234, 0.4)",
+                                            transform: "translateY(-2px)",
+                                        },
+                                    }}
+                                >
+                                    Get Started Free
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    size="large"
+                                    sx={{
+                                        fontSize: "1.1rem",
+                                        py: 1.5,
+                                        px: 4,
+                                        borderRadius: "12px",
+                                        borderColor: "#d1d5db",
+                                        color: "#374151",
+                                        "&:hover": {
+                                            borderColor: "#667eea",
+                                            backgroundColor:
+                                                "rgba(102, 126, 234, 0.05)",
+                                            color: "#667eea",
+                                        },
+                                    }}
+                                >
+                                    View Demo
+                                </Button>
+                            </Box>
+                        )}
                     </Box>
-                ) : (
-                    <Box
-                        display="flex"
-                        gap={3}
-                        justifyContent="center"
-                        flexWrap="wrap"
-                    >
-                        <Button
-                            variant="contained"
-                            size="large"
-                            sx={{
-                                fontSize: "1.1rem",
-                                py: 1.5,
-                                px: 4,
-                                borderRadius: "10px",
-                                backgroundColor: "#3b82f6",
-                                "&:hover": {
-                                    backgroundColor: "#2563eb",
-                                },
-                            }}
-                        >
-                            Get Started Free
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            size="large"
-                            sx={{
-                                fontSize: "1.1rem",
-                                py: 1.5,
-                                px: 4,
-                                borderRadius: "10px",
-                                borderColor: "#d1d5db",
-                                color: "#374151",
-                                "&:hover": {
-                                    borderColor: "#3b82f6",
-                                    backgroundColor: "rgba(59, 130, 246, 0.05)",
-                                    color: "#3b82f6",
-                                },
-                            }}
-                        >
-                            View Demo
-                        </Button>
-                    </Box>
-                )}
-            </Box>
+                </Box>
+            </Fade>
 
             {/* Stats Section with Better Spacing */}
             <Box sx={{ py: 8 }}>
-                {" "}
-                {/* Increased spacing */}
                 <Typography
                     variant="h3"
                     textAlign="center"
                     sx={{
                         fontWeight: 700,
-                        mb: 3,
+                        mb: 2,
                         color: "#1f2937",
                     }}
                 >
@@ -293,7 +350,7 @@ const Home = ({ user }) => {
                     textAlign="center"
                     sx={{
                         color: "#6b7280",
-                        mb: 8, // Increased spacing
+                        mb: 8,
                         fontWeight: 400,
                         maxWidth: "500px",
                         mx: "auto",
@@ -302,12 +359,8 @@ const Home = ({ user }) => {
                     Join thousands of developers who trust Snippetify for their
                     code management needs
                 </Typography>
-                <Grid
-                    container
-                    spacing={4}
-                    justifyContent="center"
-                    sx={{ maxWidth: "1200px", mx: "auto" }}
-                >
+
+                <Grid container spacing={4} justifyContent="center">
                     {stats.map((stat, index) => (
                         <Grid item xs={12} sm={6} md={3} key={index}>
                             <Paper
@@ -344,7 +397,6 @@ const Home = ({ user }) => {
                                     },
                                 }}
                             >
-                                {/* Icon Container */}
                                 <Box
                                     sx={{
                                         width: 80,
@@ -366,7 +418,6 @@ const Home = ({ user }) => {
                                     })}
                                 </Box>
 
-                                {/* Number */}
                                 <Typography
                                     variant="h2"
                                     sx={{
@@ -380,7 +431,6 @@ const Home = ({ user }) => {
                                     {stat.number}
                                 </Typography>
 
-                                {/* Label */}
                                 <Typography
                                     variant="h6"
                                     sx={{
@@ -392,19 +442,17 @@ const Home = ({ user }) => {
                                 >
                                     {stat.label}
                                 </Typography>
+
+                                
                             </Paper>
                         </Grid>
                     ))}
                 </Grid>
             </Box>
 
-            {/* Features Section with Better Spacing */}
+            {/* Features Section */}
             <Box sx={{ py: 8 }}>
-                {" "}
-                {/* Increased spacing */}
                 <Box textAlign="center" mb={8}>
-                    {" "}
-                    {/* Increased spacing */}
                     <Typography
                         variant="h3"
                         sx={{
@@ -429,6 +477,7 @@ const Home = ({ user }) => {
                         efficiently and beautifully.
                     </Typography>
                 </Box>
+
                 <Grid
                     container
                     spacing={4}
@@ -469,7 +518,6 @@ const Home = ({ user }) => {
                                     },
                                 }}
                             >
-                                {/* Icon Container */}
                                 <Box
                                     sx={{
                                         width: 72,
@@ -490,7 +538,6 @@ const Home = ({ user }) => {
                                     })}
                                 </Box>
 
-                                {/* Title */}
                                 <Typography
                                     variant="h6"
                                     sx={{
@@ -503,7 +550,6 @@ const Home = ({ user }) => {
                                     {feature.title}
                                 </Typography>
 
-                                {/* Description */}
                                 <Typography
                                     variant="body1"
                                     sx={{
@@ -521,22 +567,22 @@ const Home = ({ user }) => {
                 </Grid>
             </Box>
 
-            {/* CTA Section with Better Spacing */}
+            {/* CTA Section */}
             <Box
                 textAlign="center"
-                py={10} // Increased spacing
+                py={10}
                 sx={{
                     backgroundColor: "#f8fafc",
                     borderRadius: "16px",
                     border: "1px solid #e5e7eb",
                     boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
-                    mt: 4, // Added top margin
+                    mt: 4,
                 }}
             >
                 <Typography
                     variant="h3"
                     sx={{
-                        mb: 4, // Increased spacing
+                        mb: 4,
                         fontWeight: 700,
                         color: "#1f2937",
                     }}
@@ -547,7 +593,7 @@ const Home = ({ user }) => {
                     variant="h6"
                     sx={{
                         color: "#6b7280",
-                        mb: 6, // Increased spacing
+                        mb: 6,
                         fontWeight: 400,
                     }}
                 >
@@ -562,10 +608,14 @@ const Home = ({ user }) => {
                             fontSize: "1.1rem",
                             py: 1.5,
                             px: 6,
-                            borderRadius: "10px",
-                            backgroundColor: "#3b82f6",
+                            borderRadius: "12px",
+                            background:
+                                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                            boxShadow: "0 8px 25px rgba(102, 126, 234, 0.3)",
                             "&:hover": {
-                                backgroundColor: "#2563eb",
+                                boxShadow:
+                                    "0 12px 35px rgba(102, 126, 234, 0.4)",
+                                transform: "translateY(-2px)",
                             },
                         }}
                         startIcon={<Star />}
