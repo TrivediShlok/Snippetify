@@ -6,13 +6,12 @@ const snippetSchema = new mongoose.Schema(
             type: String,
             required: [true, "Title is required"],
             trim: true,
-            maxlength: [100, "Title cannot exceed 100 characters"],
+            maxlength: [200, "Title cannot exceed 200 characters"],
         },
         description: {
             type: String,
             trim: true,
-            maxlength: [500, "Description cannot exceed 500 characters"],
-            default: "",
+            maxlength: [1000, "Description cannot exceed 1000 characters"],
         },
         code: {
             type: String,
@@ -20,43 +19,38 @@ const snippetSchema = new mongoose.Schema(
             maxlength: [50000, "Code cannot exceed 50000 characters"],
         },
         programmingLanguage: {
-            // RENAMED FROM 'language' TO AVOID MONGODB CONFLICT
             type: String,
             required: [true, "Programming language is required"],
-            lowercase: true,
-            enum: {
-                values: [
-                    "javascript",
-                    "python",
-                    "java",
-                    "c",
-                    "cpp",
-                    "csharp",
-                    "php",
-                    "ruby",
-                    "go",
-                    "rust",
-                    "typescript",
-                    "html",
-                    "css",
-                    "scss",
-                    "sql",
-                    "bash",
-                    "powershell",
-                    "json",
-                    "xml",
-                    "yaml",
-                    "markdown",
-                    "swift",
-                    "kotlin",
-                    "dart",
-                    "scala",
-                    "r",
-                    "matlab",
-                    "other",
-                ],
-                message: "Please select a valid programming language",
-            },
+            enum: [
+                "javascript",
+                "typescript",
+                "python",
+                "java",
+                "c",
+                "cpp",
+                "csharp",
+                "php",
+                "ruby",
+                "go",
+                "rust",
+                "html",
+                "css",
+                "scss",
+                "sql",
+                "bash",
+                "powershell",
+                "json",
+                "xml",
+                "yaml",
+                "markdown",
+                "swift",
+                "kotlin",
+                "dart",
+                "scala",
+                "r",
+                "matlab",
+                "other",
+            ],
         },
         tags: [
             {
@@ -69,15 +63,11 @@ const snippetSchema = new mongoose.Schema(
         author: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: [true, "Author is required"],
+            required: true,
         },
         isPublic: {
             type: Boolean,
             default: false,
-        },
-        views: {
-            type: Number,
-            default: 0,
         },
         likes: [
             {
@@ -91,24 +81,16 @@ const snippetSchema = new mongoose.Schema(
                 },
             },
         ],
-        comments: [
-            {
-                user: {
-                    type: mongoose.Schema.Types.ObjectId,
-                    ref: "User",
-                    required: true,
-                },
-                text: {
-                    type: String,
-                    required: true,
-                    maxlength: [500, "Comment cannot exceed 500 characters"],
-                },
-                createdAt: {
-                    type: Date,
-                    default: Date.now,
-                },
-            },
-        ],
+        views: {
+            type: Number,
+            default: 0,
+        },
+        // FIXED: Renamed from 'collection' to 'snippetCollection' to avoid reserved keyword warning
+        snippetCollection: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Collection",
+            default: null,
+        },
         lastModified: {
             type: Date,
             default: Date.now,
@@ -116,27 +98,16 @@ const snippetSchema = new mongoose.Schema(
     },
     {
         timestamps: true,
-        toJSON: { virtuals: true },
-        toObject: { virtuals: true },
+        // FIXED: Add this option to suppress the reserved keyword warning
+        suppressReservedKeysWarning: true,
     }
 );
 
-// Virtual for like count
-snippetSchema.virtual("likeCount").get(function () {
-    return this.likes ? this.likes.length : 0;
-});
-
-// Virtual for comment count
-snippetSchema.virtual("commentCount").get(function () {
-    return this.comments ? this.comments.length : 0;
-});
-
 // Indexes for better performance
-snippetSchema.index({ author: 1 });
-snippetSchema.index({ programmingLanguage: 1 }); // UPDATED INDEX
+snippetSchema.index({ author: 1, createdAt: -1 });
+snippetSchema.index({ isPublic: 1, createdAt: -1 });
+snippetSchema.index({ programmingLanguage: 1 });
 snippetSchema.index({ tags: 1 });
-snippetSchema.index({ isPublic: 1 });
-snippetSchema.index({ createdAt: -1 });
 
 // Update lastModified on save
 snippetSchema.pre("save", function (next) {

@@ -19,7 +19,15 @@ import {
     Chip,
     InputAdornment,
 } from "@mui/material";
-import { Close, Share, Link, ContentCopy, Timer } from "@mui/icons-material";
+import {
+    Close,
+    Share,
+    Link,
+    ContentCopy,
+    Timer,
+    Lock, // ← ADDED MISSING IMPORT
+    Public, // ← ADDED THIS TOO IN CASE IT'S MISSING
+} from "@mui/icons-material";
 import { useTheme } from "../../contexts/ThemeContext";
 import { snippetService } from "../../services/snippetService";
 import toast from "react-hot-toast";
@@ -100,6 +108,7 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                 sx: {
                     borderRadius: "20px",
                     backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+                    border: `1px solid ${darkMode ? "#374151" : "#e5e7eb"}`,
                 },
             }}
         >
@@ -122,7 +131,10 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                         Share Snippet
                     </Typography>
                 </Box>
-                <IconButton onClick={handleClose}>
+                <IconButton
+                    onClick={handleClose}
+                    sx={{ color: darkMode ? "#94a3b8" : "#6b7280" }}
+                >
                     <Close />
                 </IconButton>
             </DialogTitle>
@@ -134,6 +146,7 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                         p: 2,
                         backgroundColor: darkMode ? "#334155" : "#f8fafc",
                         borderRadius: "12px",
+                        border: `1px solid ${darkMode ? "#475569" : "#e5e7eb"}`,
                     }}
                 >
                     <Typography
@@ -146,21 +159,37 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                     >
                         {snippet.title}
                     </Typography>
-                    <Box sx={{ display: "flex", gap: 1 }}>
+                    <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                         <Chip
-                            label={snippet.programmingLanguage}
+                            label={
+                                snippet.programmingLanguage ||
+                                snippet.language ||
+                                "Code"
+                            }
                             size="small"
+                            sx={{
+                                backgroundColor: darkMode
+                                    ? "#475569"
+                                    : "#e2e8f0",
+                                color: darkMode ? "#f1f5f9" : "#1f2937",
+                            }}
                         />
                         <Chip
                             icon={
                                 snippet.isPublic ? (
-                                    <Share fontSize="small" />
+                                    <Public fontSize="small" />
                                 ) : (
                                     <Lock fontSize="small" />
                                 )
                             }
                             label={snippet.isPublic ? "Public" : "Private"}
                             size="small"
+                            sx={{
+                                backgroundColor: snippet.isPublic
+                                    ? "#dcfce7"
+                                    : "#fed7aa",
+                                color: snippet.isPublic ? "#166534" : "#c2410c",
+                            }}
                         />
                     </Box>
                 </Box>
@@ -172,13 +201,18 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                             sx={{
                                 mb: 3,
                                 color: darkMode ? "#f1f5f9" : "#1f2937",
+                                fontWeight: 600,
                             }}
                         >
                             Share Options
                         </Typography>
 
                         <FormControl fullWidth sx={{ mb: 3 }}>
-                            <InputLabel>Expires In</InputLabel>
+                            <InputLabel
+                                sx={{ color: darkMode ? "#94a3b8" : "#6b7280" }}
+                            >
+                                Expires In
+                            </InputLabel>
                             <Select
                                 value={options.expiresIn}
                                 onChange={(e) =>
@@ -192,13 +226,71 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                                     backgroundColor: darkMode
                                         ? "#334155"
                                         : "#ffffff",
+                                    "& .MuiOutlinedInput-notchedOutline": {
+                                        borderColor: darkMode
+                                            ? "#475569"
+                                            : "#d1d5db",
+                                    },
+                                    "& .MuiSelect-select": {
+                                        color: darkMode ? "#f1f5f9" : "#1f2937",
+                                    },
+                                    "& .MuiSvgIcon-root": {
+                                        color: darkMode ? "#94a3b8" : "#6b7280",
+                                    },
+                                }}
+                                MenuProps={{
+                                    PaperProps: {
+                                        sx: {
+                                            backgroundColor: darkMode
+                                                ? "#1e293b"
+                                                : "#ffffff",
+                                            border: `1px solid ${
+                                                darkMode ? "#475569" : "#e5e7eb"
+                                            }`,
+                                        },
+                                    },
                                 }}
                             >
-                                <MenuItem value="">Never</MenuItem>
-                                <MenuItem value="1">1 Hour</MenuItem>
-                                <MenuItem value="24">24 Hours</MenuItem>
-                                <MenuItem value="168">1 Week</MenuItem>
-                                <MenuItem value="720">1 Month</MenuItem>
+                                <MenuItem
+                                    value=""
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#1f2937",
+                                    }}
+                                >
+                                    Never
+                                </MenuItem>
+                                <MenuItem
+                                    value="1"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#1f2937",
+                                    }}
+                                >
+                                    1 Hour
+                                </MenuItem>
+                                <MenuItem
+                                    value="24"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#1f2937",
+                                    }}
+                                >
+                                    24 Hours
+                                </MenuItem>
+                                <MenuItem
+                                    value="168"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#1f2937",
+                                    }}
+                                >
+                                    1 Week
+                                </MenuItem>
+                                <MenuItem
+                                    value="720"
+                                    sx={{
+                                        color: darkMode ? "#f1f5f9" : "#1f2937",
+                                    }}
+                                >
+                                    1 Month
+                                </MenuItem>
                             </Select>
                         </FormControl>
 
@@ -215,7 +307,15 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                                     sx={{
                                         "& .MuiSwitch-switchBase.Mui-checked": {
                                             color: "#667eea",
+                                            "&:hover": {
+                                                backgroundColor:
+                                                    "rgba(102, 126, 234, 0.1)",
+                                            },
                                         },
+                                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                                            {
+                                                backgroundColor: "#667eea",
+                                            },
                                     }}
                                 />
                             }
@@ -224,11 +324,24 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                                 mb: 2,
                                 "& .MuiFormControlLabel-label": {
                                     color: darkMode ? "#94a3b8" : "#6b7280",
+                                    fontWeight: 500,
                                 },
                             }}
                         />
 
-                        <Alert severity="info" sx={{ mb: 3 }}>
+                        <Alert
+                            severity="info"
+                            sx={{
+                                mb: 3,
+                                backgroundColor: darkMode
+                                    ? "#1e40af"
+                                    : "#dbeafe",
+                                color: darkMode ? "#bfdbfe" : "#1e40af",
+                                "& .MuiAlert-icon": {
+                                    color: darkMode ? "#bfdbfe" : "#1e40af",
+                                },
+                            }}
+                        >
                             Anyone with the link will be able to view this
                             snippet. Choose expiration time for added security.
                         </Alert>
@@ -240,6 +353,7 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                             sx={{
                                 mb: 2,
                                 color: darkMode ? "#f1f5f9" : "#1f2937",
+                                fontWeight: 600,
                             }}
                         >
                             Shareable Link Created
@@ -256,16 +370,50 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                                         <IconButton
                                             onClick={handleCopyLink}
                                             edge="end"
+                                            sx={{
+                                                color: darkMode
+                                                    ? "#94a3b8"
+                                                    : "#6b7280",
+                                            }}
                                         >
                                             <ContentCopy />
                                         </IconButton>
                                     </InputAdornment>
                                 ),
                             }}
-                            sx={{ mb: 3 }}
+                            sx={{
+                                mb: 3,
+                                "& .MuiOutlinedInput-root": {
+                                    backgroundColor: darkMode
+                                        ? "#334155"
+                                        : "#ffffff",
+                                    "& fieldset": {
+                                        borderColor: darkMode
+                                            ? "#475569"
+                                            : "#d1d5db",
+                                    },
+                                },
+                                "& .MuiInputLabel-root": {
+                                    color: darkMode ? "#94a3b8" : "#6b7280",
+                                },
+                                "& .MuiOutlinedInput-input": {
+                                    color: darkMode ? "#f1f5f9" : "#1f2937",
+                                },
+                            }}
                         />
 
-                        <Alert severity="success">
+                        <Alert
+                            severity="success"
+                            sx={{
+                                backgroundColor: darkMode
+                                    ? "#166534"
+                                    : "#dcfce7",
+                                color: darkMode ? "#bbf7d0" : "#166534",
+                                "& .MuiAlert-icon": {
+                                    color: darkMode ? "#bbf7d0" : "#166534",
+                                },
+                            }}
+                        >
                             Link created successfully! Share this URL with
                             anyone you want to give access to your snippet.
                         </Alert>
@@ -274,17 +422,29 @@ const ShareDialog = ({ open, snippet, onClose }) => {
             </DialogContent>
 
             <DialogActions sx={{ p: 3, pt: 0 }}>
-                <Button onClick={handleClose}>Close</Button>
+                <Button
+                    onClick={handleClose}
+                    sx={{ color: darkMode ? "#94a3b8" : "#6b7280" }}
+                >
+                    Close
+                </Button>
                 {!shareLink ? (
                     <Button
                         variant="contained"
                         onClick={handleCreateLink}
                         disabled={loading}
-                        startIcon={<Link />}
+                        startIcon={loading ? <Timer /> : <Link />}
                         sx={{
                             background:
                                 "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                             px: 3,
+                            "&:hover": {
+                                background:
+                                    "linear-gradient(135deg, #5a6fd8 0%, #6b4190 100%)",
+                            },
+                            "&:disabled": {
+                                background: darkMode ? "#475569" : "#d1d5db",
+                            },
                         }}
                     >
                         {loading ? "Creating..." : "Create Share Link"}
@@ -298,6 +458,10 @@ const ShareDialog = ({ open, snippet, onClose }) => {
                             background:
                                 "linear-gradient(135deg, #10b981 0%, #059669 100%)",
                             px: 3,
+                            "&:hover": {
+                                background:
+                                    "linear-gradient(135deg, #059669 0%, #047857 100%)",
+                            },
                         }}
                     >
                         Copy Link
