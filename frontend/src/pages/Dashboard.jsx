@@ -24,7 +24,6 @@ import {
     Menu,
     ListItemIcon,
     ListItemText,
-    Divider,
 } from "@mui/material";
 import {
     Add,
@@ -42,8 +41,6 @@ import {
     Share,
     MoreVert,
     Collections,
-    ViewModule,
-    ViewList,
 } from "@mui/icons-material";
 import { useTheme } from "../contexts/ThemeContext";
 import { snippetService } from "../services/snippetService";
@@ -65,11 +62,10 @@ const Dashboard = ({ user }) => {
     const [saving, setSaving] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [languageFilter, setLanguageFilter] = useState("");
-    const [publicFilter, setPublicFilter] = useState(""); // Fixed: proper state management
+    const [publicFilter, setPublicFilter] = useState("");
     const [collectionFilter, setCollectionFilter] = useState("all");
     const [sortBy, setSortBy] = useState("createdAt");
     const [sortOrder, setSortOrder] = useState("desc");
-    const [viewMode, setViewMode] = useState("grid"); // grid or list
     const [error, setError] = useState("");
     const [showCollectionDialog, setShowCollectionDialog] = useState(false);
     const [showShareDialog, setShowShareDialog] = useState(false);
@@ -100,7 +96,6 @@ const Dashboard = ({ user }) => {
             if (searchTerm.trim()) params.search = searchTerm.trim();
             if (languageFilter) params.language = languageFilter;
 
-            // FIXED: Proper public filter handling
             if (publicFilter !== "") {
                 params.isPublic = publicFilter;
             }
@@ -215,7 +210,7 @@ const Dashboard = ({ user }) => {
                 setEditSnippet(null);
                 await loadSnippets();
                 if (data.collection) {
-                    await loadCollections(); // Reload collections if snippet was added to one
+                    await loadCollections();
                 }
             } else {
                 throw new Error(response.message || "Failed to save snippet");
@@ -317,7 +312,7 @@ const Dashboard = ({ user }) => {
     const clearFilters = () => {
         setSearchTerm("");
         setLanguageFilter("");
-        setPublicFilter(""); // Fixed: proper clearing
+        setPublicFilter("");
         setCollectionFilter("all");
         setSortBy("createdAt");
         setSortOrder("desc");
@@ -328,8 +323,6 @@ const Dashboard = ({ user }) => {
         languageFilter ||
         publicFilter !== "" ||
         collectionFilter !== "all";
-
-    // Get unique languages for filter
     const languages = [
         ...new Set(snippets.map((s) => s.programmingLanguage).filter(Boolean)),
     ];
@@ -407,62 +400,6 @@ const Dashboard = ({ user }) => {
                     </Box>
 
                     <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-                        {/* View Mode Toggle */}
-                        <Box
-                            sx={{
-                                display: "flex",
-                                border: `1px solid ${
-                                    darkMode ? "#475569" : "#e5e7eb"
-                                }`,
-                                borderRadius: "8px",
-                            }}
-                        >
-                            <Tooltip title="Grid View">
-                                <IconButton
-                                    size="small"
-                                    onClick={() => setViewMode("grid")}
-                                    sx={{
-                                        color:
-                                            viewMode === "grid"
-                                                ? "#667eea"
-                                                : darkMode
-                                                ? "#94a3b8"
-                                                : "#6b7280",
-                                        backgroundColor:
-                                            viewMode === "grid"
-                                                ? darkMode
-                                                    ? "#334155"
-                                                    : "#f1f5f9"
-                                                : "transparent",
-                                    }}
-                                >
-                                    <ViewModule />
-                                </IconButton>
-                            </Tooltip>
-                            <Tooltip title="List View">
-                                <IconButton
-                                    size="small"
-                                    onClick={() => setViewMode("list")}
-                                    sx={{
-                                        color:
-                                            viewMode === "list"
-                                                ? "#667eea"
-                                                : darkMode
-                                                ? "#94a3b8"
-                                                : "#6b7280",
-                                        backgroundColor:
-                                            viewMode === "list"
-                                                ? darkMode
-                                                    ? "#334155"
-                                                    : "#f1f5f9"
-                                                : "transparent",
-                                    }}
-                                >
-                                    <ViewList />
-                                </IconButton>
-                            </Tooltip>
-                        </Box>
-
                         {/* More Actions Menu */}
                         <Tooltip title="More Actions">
                             <IconButton
@@ -574,7 +511,6 @@ const Dashboard = ({ user }) => {
                     }}
                 >
                     <CardContent sx={{ p: 3 }}>
-                        {/* Filter Header */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -768,74 +704,19 @@ const Dashboard = ({ user }) => {
                                                 : "#9ca3af",
                                         },
                                     }}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            sx: {
-                                                backgroundColor: darkMode
-                                                    ? "#1e293b"
-                                                    : "#ffffff",
-                                                border: `1px solid ${
-                                                    darkMode
-                                                        ? "#475569"
-                                                        : "#e5e7eb"
-                                                }`,
-                                            },
-                                        },
-                                    }}
                                 >
                                     <MenuItem value="all">
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 1,
-                                                color: darkMode
-                                                    ? "#94a3b8"
-                                                    : "#9ca3af",
-                                            }}
-                                        >
-                                            <Folder fontSize="small" />
-                                            All Collections
-                                        </Box>
+                                        All Collections
                                     </MenuItem>
                                     <MenuItem value="uncategorized">
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 1,
-                                                color: darkMode
-                                                    ? "#f1f5f9"
-                                                    : "#1f2937",
-                                            }}
-                                        >
-                                            <FolderOpen fontSize="small" />
-                                            Uncategorized
-                                        </Box>
+                                        Uncategorized
                                     </MenuItem>
                                     {collections.map((collection) => (
                                         <MenuItem
                                             key={collection._id}
                                             value={collection._id}
                                         >
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 1,
-                                                    color: darkMode
-                                                        ? "#f1f5f9"
-                                                        : "#1f2937",
-                                                }}
-                                            >
-                                                <Folder
-                                                    fontSize="small"
-                                                    sx={{
-                                                        color: collection.color,
-                                                    }}
-                                                />
-                                                {collection.name}
-                                            </Box>
+                                            {collection.name}
                                         </MenuItem>
                                     ))}
                                 </Select>
@@ -901,57 +782,17 @@ const Dashboard = ({ user }) => {
                                                 : "#9ca3af",
                                         },
                                     }}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            sx: {
-                                                backgroundColor: darkMode
-                                                    ? "#1e293b"
-                                                    : "#ffffff",
-                                                border: `1px solid ${
-                                                    darkMode
-                                                        ? "#475569"
-                                                        : "#e5e7eb"
-                                                }`,
-                                            },
-                                        },
-                                    }}
                                 >
-                                    <MenuItem value="">
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 1,
-                                                color: darkMode
-                                                    ? "#94a3b8"
-                                                    : "#9ca3af",
-                                            }}
-                                        >
-                                            <Code fontSize="small" />
-                                            All Languages
-                                        </Box>
-                                    </MenuItem>
+                                    <MenuItem value="">All Languages</MenuItem>
                                     {languages.sort().map((lang) => (
                                         <MenuItem key={lang} value={lang}>
-                                            <Box
-                                                sx={{
-                                                    display: "flex",
-                                                    alignItems: "center",
-                                                    gap: 1,
-                                                    color: darkMode
-                                                        ? "#f1f5f9"
-                                                        : "#1f2937",
-                                                }}
-                                            >
-                                                <Code fontSize="small" />
-                                                {lang.toUpperCase()}
-                                            </Box>
+                                            {lang.toUpperCase()}
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </Grid>
 
-                            {/* Visibility Filter - FIXED */}
+                            {/* Visibility Filter */}
                             <Grid item xs={12} sm={6} lg={2}>
                                 <Typography
                                     variant="subtitle2"
@@ -970,14 +811,9 @@ const Dashboard = ({ user }) => {
                                 <Select
                                     fullWidth
                                     value={publicFilter}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        console.log(
-                                            "Dashboard: Setting publicFilter to:",
-                                            value
-                                        );
-                                        setPublicFilter(value);
-                                    }}
+                                    onChange={(e) =>
+                                        setPublicFilter(e.target.value)
+                                    }
                                     displayEmpty
                                     sx={{
                                         backgroundColor: darkMode
@@ -1016,71 +852,13 @@ const Dashboard = ({ user }) => {
                                                 : "#9ca3af",
                                         },
                                     }}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            sx: {
-                                                backgroundColor: darkMode
-                                                    ? "#1e293b"
-                                                    : "#ffffff",
-                                                border: `1px solid ${
-                                                    darkMode
-                                                        ? "#475569"
-                                                        : "#e5e7eb"
-                                                }`,
-                                            },
-                                        },
-                                    }}
                                 >
-                                    <MenuItem value="">
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 1,
-                                                color: darkMode
-                                                    ? "#94a3b8"
-                                                    : "#9ca3af",
-                                            }}
-                                        >
-                                            <Public fontSize="small" />
-                                            All Snippets
-                                        </Box>
-                                    </MenuItem>
+                                    <MenuItem value="">All Snippets</MenuItem>
                                     <MenuItem value="true">
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 1,
-                                                color: darkMode
-                                                    ? "#f1f5f9"
-                                                    : "#1f2937",
-                                            }}
-                                        >
-                                            <Public
-                                                fontSize="small"
-                                                sx={{ color: "#10b981" }}
-                                            />
-                                            Public Only
-                                        </Box>
+                                        Public Only
                                     </MenuItem>
                                     <MenuItem value="false">
-                                        <Box
-                                            sx={{
-                                                display: "flex",
-                                                alignItems: "center",
-                                                gap: 1,
-                                                color: darkMode
-                                                    ? "#f1f5f9"
-                                                    : "#1f2937",
-                                            }}
-                                        >
-                                            <Lock
-                                                fontSize="small"
-                                                sx={{ color: "#f59e0b" }}
-                                            />
-                                            Private Only
-                                        </Box>
+                                        Private Only
                                     </MenuItem>
                                 </Select>
                             </Grid>
@@ -1122,20 +900,6 @@ const Dashboard = ({ user }) => {
                                             color: darkMode
                                                 ? "#f1f5f9"
                                                 : "#1f2937",
-                                        },
-                                    }}
-                                    MenuProps={{
-                                        PaperProps: {
-                                            sx: {
-                                                backgroundColor: darkMode
-                                                    ? "#1e293b"
-                                                    : "#ffffff",
-                                                border: `1px solid ${
-                                                    darkMode
-                                                        ? "#475569"
-                                                        : "#e5e7eb"
-                                                }`,
-                                            },
                                         },
                                     }}
                                 >
@@ -1328,7 +1092,7 @@ const Dashboard = ({ user }) => {
                 </Box>
             )}
 
-            {/* Snippets List */}
+            {/* ✅ IMPROVED: Snippets Grid Layout */}
             <Paper
                 elevation={0}
                 sx={{
@@ -1448,81 +1212,9 @@ const Dashboard = ({ user }) => {
                         onToggleLike={handleToggleLike}
                         onShare={handleShare}
                         user={user}
-                        viewMode={viewMode}
-                        selectedSnippets={selectedSnippets}
-                        onSelectionChange={setSelectedSnippets}
                     />
                 )}
             </Paper>
-
-            {/* Pagination */}
-            {!loading && snippets.length > 0 && pagination.pages > 1 && (
-                <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>
-                    <Paper
-                        elevation={0}
-                        sx={{
-                            p: 2,
-                            borderRadius: "16px",
-                            border: `1px solid ${
-                                darkMode ? "#374151" : "#e5e7eb"
-                            }`,
-                            backgroundColor: darkMode ? "#1e293b" : "#ffffff",
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 2,
-                            }}
-                        >
-                            <Button
-                                variant="outlined"
-                                disabled={!pagination.hasPrev}
-                                onClick={() =>
-                                    loadSnippets(pagination.current - 1)
-                                }
-                                sx={{
-                                    borderRadius: "12px",
-                                    px: 3,
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Previous
-                            </Button>
-                            <Typography
-                                sx={{
-                                    px: 4,
-                                    py: 1,
-                                    color: darkMode ? "#94a3b8" : "#6b7280",
-                                    fontSize: "1rem",
-                                    fontWeight: 600,
-                                    backgroundColor: darkMode
-                                        ? "#334155"
-                                        : "#f8fafc",
-                                    borderRadius: "8px",
-                                }}
-                            >
-                                Page {pagination.current} of {pagination.pages}
-                            </Typography>
-                            <Button
-                                variant="outlined"
-                                disabled={!pagination.hasNext}
-                                onClick={() =>
-                                    loadSnippets(pagination.current + 1)
-                                }
-                                sx={{
-                                    borderRadius: "12px",
-                                    px: 3,
-                                    fontWeight: 600,
-                                }}
-                            >
-                                Next
-                            </Button>
-                        </Box>
-                    </Paper>
-                </Box>
-            )}
 
             {/* Dialogs */}
             <CollectionDialog

@@ -18,6 +18,7 @@ const collectionService = {
         }
     },
 
+    // ✅ FIXED: Correct API endpoint and method
     async createCollection(collectionData) {
         try {
             const response = await apiRequest("/collections", {

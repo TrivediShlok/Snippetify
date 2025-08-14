@@ -114,6 +114,8 @@ try {
     app.use("/api/auth", require("./routes/auth"));
     app.use("/api/users", require("./routes/users"));
     app.use("/api/snippets", require("./routes/snippets"));
+
+    app.use("/api/collections", require("./routes/collectionRoutes"));
 } catch (error) {
     console.error("Route loading error:", error.message);
 }
