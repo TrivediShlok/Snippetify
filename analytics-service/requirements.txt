@@ -1,0 +1,15 @@
+Django
+djangorestframework
+django-cors-headers
+pandas
+numpy
+matplotlib
+seaborn
+wordcloud
+scikit-learn
+textstat
+requests
+python-dotenv
+pymongo
+celery
+redis

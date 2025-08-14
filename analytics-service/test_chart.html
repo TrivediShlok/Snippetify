@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Analytics Chart Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Snippetify Analytics Test</h1>
+    
+    <button onclick="loadChart()">Load Language Distribution Chart</button>
+    
+    <div id="chart-container">
+        <p>Click the button above to load your chart!</p>
+    </div>
+
+    <script>
+        async function loadChart() {
+            try {
+                const response = await fetch('http://localhost:8001/api/analytics/charts/language-pie/');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('chart-container').innerHTML = 
+                        `<img src="data:image/png;base64,${data.chart_data}" alt="Language Distribution Chart" style="max-width: 100%;">`;
+                } else {
+                    document.getElementById('chart-container').innerHTML = 
+                        `<p>Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('chart-container').innerHTML = 
+                    `<p>Error loading chart: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

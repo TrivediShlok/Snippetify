@@ -1,3 +1,4 @@
+import SimpleAnalytics from "./components/SimpleAnalytics";
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Box, CircularProgress, Alert, Container } from "@mui/material";
@@ -127,6 +128,10 @@ function App() {
                             element={<SnippetDetail user={user} />}
                         />
                         <Route path="*" element={<Navigate to="/" replace />} />
+                        <Route
+                            path="/analytics"
+                            element={<SimpleAnalytics />}
+                        />
                     </Routes>
                 </Box>
             </Box>
